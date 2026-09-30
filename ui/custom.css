@@ -1,0 +1,138 @@
+/* ==========================================================================
+   CRESCENT UI CUSTOM THEME STYLESHEET (custom.css)
+   ==========================================================================
+   This stylesheet is automatically injected into all Crescent UI views:
+   - Monaco.html     (Code Editor, Explorer, Console, Tabs)
+   - Home.html       (Dashboard, News, Stats)
+   - ScriptHub.html  (Script Browser & Search)
+   - Settings.html   (Configuration Page)
+   - PageBtn.html    (Sidebar Navigation Icons)
+   - Title.html      (Top Title Bar)
+   - ControlBox.html (Window Minimize / Close Buttons)
+   - Animation.html  (Startup Splash Intro)
+
+   HOW TO EDIT:
+   1. Change any of the CSS variables below in :root { ... }
+   2. Save this file.
+   3. If Crescent is running with developer_mode.txt, press F5 to reload!
+   4. Or restart Crescent via Run_Crescent.bat.
+   ========================================================================== */
+
+:root {
+  /* ========================================
+     1. ACCENT & BRAND COLORS
+     Change these to your favorite color!
+     ======================================== */
+  --crescent-accent: #3b82f6;          /* Primary Accent (Default: Electric Blue #3b82f6) */
+  --crescent-accent-hover: #60a5fa;    /* Accent Hover State */
+  --crescent-accent-glow: rgba(59, 130, 246, 0.4); /* Neon Glow */
+  --crescent-accent-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+
+  /* ========================================
+     2. BACKGROUND & SURFACE COLORS
+     ======================================== */
+  --crescent-bg-main: #0c0c0c;         /* Main Background (Dark Black) */
+  --crescent-bg-surface: #141414;      /* Card & Panel Background */
+  --crescent-bg-surface-hover: #1c1c1c;/* Hovered items */
+  --crescent-bg-input: #111111;        /* Text boxes & inputs */
+  --crescent-border: rgba(255, 255, 255, 0.08); /* Subtle borders */
+
+  /* ========================================
+     3. TEXT & ICON COLORS
+     ======================================== */
+  --crescent-text-primary: #f3f4f6;    /* Main Text */
+  --crescent-text-secondary: #9ca3af;  /* Subtitles & Descriptions */
+  --crescent-text-muted: #6b7280;      /* Muted Labels & Hints */
+
+  /* ========================================
+     4. TYPOGRAPHY & SHAPES
+     ======================================== */
+  --crescent-font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+  --crescent-radius-sm: 6px;
+  --crescent-radius-md: 10px;
+  --crescent-radius-lg: 14px;
+}
+
+/* ==========================================================================
+   EXAMPLE THEME PRESETS (Uncomment one to quickly apply!)
+   ========================================================================== */
+
+/* --- PRESET 1: VIOLET / CYBERPURPLE ---
+:root {
+  --crescent-accent: #a855f7;
+  --crescent-accent-hover: #c084fc;
+  --crescent-accent-glow: rgba(168, 85, 247, 0.45);
+  --crescent-accent-gradient: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
+}
+*/
+
+/* --- PRESET 2: EMERALD / MATRIX GREEN ---
+:root {
+  --crescent-accent: #10b981;
+  --crescent-accent-hover: #34d399;
+  --crescent-accent-glow: rgba(16, 185, 129, 0.45);
+  --crescent-accent-gradient: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+}
+*/
+
+/* --- PRESET 3: CRIMSON / BLOOD RED ---
+:root {
+  --crescent-accent: #ef4444;
+  --crescent-accent-hover: #f87171;
+  --crescent-accent-glow: rgba(239, 68, 68, 0.45);
+  --crescent-accent-gradient: linear-gradient(135deg, #ef4444 0%, #f59e0b 100%);
+}
+*/
+
+/* ==========================================================================
+   GLOBAL UI OVERRIDES
+   ========================================================================== */
+
+/* Custom Smooth Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--crescent-accent, #3b82f6);
+}
+
+/* Text Selection Glow */
+::selection {
+  background: var(--crescent-accent, #3b82f6);
+  color: #ffffff;
+}
+
+/* Sidebar Active Button Glow */
+.nav-item.active,
+.page-btn.active {
+  color: var(--crescent-accent, #3b82f6) !important;
+  filter: drop-shadow(0 0 8px var(--crescent-accent-glow, rgba(59, 130, 246, 0.5)));
+}
+
+/* Action Buttons Glow */
+.btn-primary,
+button.execute-btn,
+button.attach-btn {
+  background: var(--crescent-accent-gradient, #3b82f6) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px var(--crescent-accent-glow, rgba(59, 130, 246, 0.35)) !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.btn-primary:hover,
+button.execute-btn:hover,
+button.attach-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px var(--crescent-accent-glow, rgba(59, 130, 246, 0.5)) !important;
+}

@@ -1,0 +1,71 @@
+System.Runtime.InteropServices.COMException (0x8007139F): The group or resource is not in the correct state to perform the requested operation. (0x8007139F)
+   at Microsoft.Web.WebView2.Core.Raw.ICoreWebView2.PostWebMessageAsString(String webMessageAsString)
+   at Microsoft.Web.WebView2.Core.CoreWebView2.PostWebMessageAsString(String webMessageAsString)
+System.Runtime.InteropServices.COMException (0x8007139F): The group or resource is not in the correct state to perform the requested operation. (0x8007139F)
+   at Microsoft.Web.WebView2.Core.Raw.ICoreWebView2.PostWebMessageAsString(String webMessageAsString)
+   at Microsoft.Web.WebView2.Core.CoreWebView2.PostWebMessageAsString(String webMessageAsString)
+System.Runtime.InteropServices.COMException (0x8007139F): The group or resource is not in the correct state to perform the requested operation. (0x8007139F)
+   at Microsoft.Web.WebView2.Core.Raw.ICoreWebView2.PostWebMessageAsString(String webMessageAsString)
+   at Microsoft.Web.WebView2.Core.CoreWebView2.PostWebMessageAsString(String webMessageAsString)
+System.Runtime.InteropServices.COMException (0x8007139F): The group or resource is not in the correct state to perform the requested operation. (0x8007139F)
+   at Microsoft.Web.WebView2.Core.Raw.ICoreWebView2.PostWebMessageAsString(String webMessageAsString)
+   at Microsoft.Web.WebView2.Core.CoreWebView2.PostWebMessageAsString(String webMessageAsString)
+System.Runtime.InteropServices.COMException (0x8007139F): The group or resource is not in the correct state to perform the requested operation. (0x8007139F)
+   at Microsoft.Web.WebView2.Core.Raw.ICoreWebView2.PostWebMessageAsString(String webMessageAsString)
+   at Microsoft.Web.WebView2.Core.CoreWebView2.PostWebMessageAsString(String webMessageAsString)
+System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.HttpListener'.
+   at System.Net.HttpListener.Stop()
+   at Feairl.Form1.Form1_FormClosed(Object sender, FormClosedEventArgs e) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 5026
+   at System.Windows.Forms.Form.WmClose(Message& m)
+   at System.Windows.Forms.Form.WndProc(Message& m)
+   at Feairl.Form1.WndProc(Message& m) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 860
+   at System.Windows.Forms.NativeWindow.Callback(HWND hWnd, MessageId msg, WPARAM wparam, LPARAM lparam)
+System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.HttpListener'.
+   at System.Net.HttpListener.Stop()
+   at Feairl.Form1.Form1_FormClosed(Object sender, FormClosedEventArgs e) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 5026
+   at System.Windows.Forms.Form.WmClose(Message& m)
+   at System.Windows.Forms.Form.WndProc(Message& m)
+   at Feairl.Form1.WndProc(Message& m) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 860
+   at System.Windows.Forms.NativeWindow.Callback(HWND hWnd, MessageId msg, WPARAM wparam, LPARAM lparam)
+System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.HttpListener'.
+   at System.Net.HttpListener.Stop()
+   at Feairl.Form1.Form1_FormClosed(Object sender, FormClosedEventArgs e) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 5026
+   at System.Windows.Forms.Form.WmClose(Message& m)
+   at System.Windows.Forms.Form.WndProc(Message& m)
+   at Feairl.Form1.WndProc(Message& m) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 860
+   at System.Windows.Forms.NativeWindow.Callback(HWND hWnd, MessageId msg, WPARAM wparam, LPARAM lparam)
+System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.HttpListener'.
+   at System.Net.HttpListener.Stop()
+   at Feairl.Form1.Form1_FormClosed(Object sender, FormClosedEventArgs e) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 5026
+   at System.Windows.Forms.Form.WmClose(Message& m)
+   at System.Windows.Forms.Form.WndProc(Message& m)
+   at Feairl.Form1.WndProc(Message& m) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 860
+   at System.Windows.Forms.NativeWindow.Callback(HWND hWnd, MessageId msg, WPARAM wparam, LPARAM lparam)
+System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.HttpListener'.
+   at System.Net.HttpListener.Stop()
+   at Feairl.Form1.Form1_FormClosed(Object sender, FormClosedEventArgs e) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 5026
+   at System.Windows.Forms.Form.WmClose(Message& m)
+   at System.Windows.Forms.Form.WndProc(Message& m)
+   at Feairl.Form1.WndProc(Message& m) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 860
+   at System.Windows.Forms.NativeWindow.Callback(HWND hWnd, MessageId msg, WPARAM wparam, LPARAM lparam)
+System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.HttpListener'.
+   at System.Net.HttpListener.Stop()
+   at Feairl.Form1.Form1_FormClosed(Object sender, FormClosedEventArgs e) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 5026
+   at System.Windows.Forms.Form.WmClose(Message& m)
+   at System.Windows.Forms.Form.WndProc(Message& m)
+   at Feairl.Form1.WndProc(Message& m) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 860
+   at System.Windows.Forms.NativeWindow.Callback(HWND hWnd, MessageId msg, WPARAM wparam, LPARAM lparam)
+System.ObjectDisposedException: Cannot access a disposed object.
+Object name: 'System.Net.HttpListener'.
+   at System.Net.HttpListener.Stop()
+   at Feairl.Form1.Form1_FormClosed(Object sender, FormClosedEventArgs e) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 5026
+   at System.Windows.Forms.Form.WmClose(Message& m)
+   at System.Windows.Forms.Form.WndProc(Message& m)
+   at Feairl.Form1.WndProc(Message& m) in C:\Users\ohsxn\OneDrive\Pictures\New folder\crescent_source\Feairl\Form1.cs:line 860
+   at System.Windows.Forms.NativeWindow.Callback(HWND hWnd, MessageId msg, WPARAM wparam, LPARAM lparam)

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>Electra Animation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  #bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-color: rgb(12, 12, 12);
+    opacity: 1;
+  }
+
+  #bg.play {
+    animation: bgFadeOut 1.5s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+    animation-delay: 2.8s;
+  }
+
+  .logo-text {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    font-size: 9vw;
+    letter-spacing: 0.01em;
+    display: flex;
+    opacity: 0;
+    transform: scale(0.85);
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo-text.play {
+    animation: logoFadeIn 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+               logoFadeOut 1.5s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+    animation-delay: 0s, 2.8s;
+  }
+
+  .logo-text span {
+    color: rgb(70, 70, 70);
+  }
+
+  .logo-text.play span {
+    animation: letterLight 0.5s ease-out forwards;
+  }
+
+  @keyframes logoFadeIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes logoFadeOut {
+    0% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.85);
+    }
+  }
+
+  @keyframes letterLight {
+    0% {
+      color: rgb(70, 70, 70);
+    }
+    100% {
+      color: rgb(255, 255, 255);
+    }
+  }
+
+  @keyframes bgFadeOut {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="bg"></div>
+  <div class="logo-text" id="logoText">
+    <span style="animation-delay: 0.6s">E</span><span style="animation-delay: 0.8s">l</span><span style="animation-delay: 1.0s">e</span><span style="animation-delay: 1.2s">c</span><span style="animation-delay: 1.4s">t</span><span style="animation-delay: 1.6s">r</span><span style="animation-delay: 1.8s">a</span>
+  </div>
+
+  <script>
+    var logo = document.getElementById('logoText');
+    var bg = document.getElementById('bg');
+
+    function startAnimation() {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          document.body.classList.add('play');
+          logo.classList.add('play');
+          bg.classList.add('play');
+        });
+      });
+    }
+
+    startAnimation();
+
+    logo.addEventListener('animationstart', function (e) {
+      if (e.animationName === 'logoFadeOut') {
+        var duration = parseFloat(getComputedStyle(logo).animationDuration.split(',')[1]) * 1000;
+        var sendAt = Math.max(duration - 200, 0);
+
+        setTimeout(function () {
+          if (window.chrome && window.chrome.webview) {
+            window.chrome.webview.postMessage('AnimationFinished');
+          }
+        }, sendAt);
+      }
+    });
+  </script>
+</body>
+</html>

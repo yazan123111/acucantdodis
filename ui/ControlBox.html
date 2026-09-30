@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ControlBox</title>
+
+    <script>
+        (function () {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+
+        (function () {
+            function applyTheme(theme) {
+                theme = (theme === 'light') ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+
+                try {
+                    window.dispatchEvent(new CustomEvent('themechange', {
+                        detail: { theme: theme }
+                    }));
+                } catch (e) { }
+
+                if (window.chrome && window.chrome.webview) {
+                    try {
+                        window.chrome.webview.postMessage({
+                            action: 'themeChanged',
+                            theme: theme
+                        });
+                    } catch (e) { }
+                }
+            }
+
+            window.ThemeAPI = {
+                setDark: function () {
+                    applyTheme('dark');
+                },
+                setLight: function () {
+                    applyTheme('light');
+                },
+                toggle: function () {
+                    const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                    applyTheme(cur === 'light' ? 'dark' : 'light');
+                },
+                getTheme: function () {
+                    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                }
+            };
+        })();
+    </script>
+
+    <style>
+        :root {
+            --bg: transparent;
+            --border: #2c2c2c;
+            --icon-color: rgb(160, 160, 160);
+            --icon-hover: #ffffff;
+            --btn-hover-bg: rgba(255, 255, 255, 0.12);
+        }
+
+        [data-theme="light"] {
+            --bg: transparent;
+            --border: #e2e2e2;
+            --icon-color: #6b6b6b;
+            --icon-hover: #1c1c1c;
+            --btn-hover-bg: rgba(0, 0, 0, 0.06);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            user-select: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.15s ease;
+        }
+
+        .control-box {
+            display: flex;
+        }
+
+        .btn {
+            width: 46px;
+            height: 34px;
+            border: none;
+            border-radius: 0;
+            background-color: transparent;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            transition: background-color 0.1s ease;
+        }
+
+        .btn-minimize svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .btn-maximize svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .btn-close svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .icon-path {
+            fill: none;
+            stroke: var(--icon-color);
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.1s ease;
+        }
+
+        .icon-restore {
+            display: none;
+        }
+
+        .btn-maximize.maximized .icon-max {
+            display: none;
+        }
+
+        .btn-maximize.maximized .icon-restore {
+            display: block;
+        }
+
+        .btn-minimize.is-hover,
+        .btn-maximize.is-hover {
+            background-color: var(--btn-hover-bg);
+        }
+
+            .btn-minimize.is-hover .icon-path,
+            .btn-maximize.is-hover .icon-path {
+                stroke: var(--icon-hover);
+            }
+
+        .btn-close.is-hover {
+            background-color: rgb(232, 17, 35);
+        }
+
+            .btn-close.is-hover .icon-path {
+                stroke: #ffffff;
+            }
+    </style>
+</head>
+<body onmousedown="startDrag(event)">
+
+    <div class="control-box">
+        <button class="btn btn-minimize" onclick="sendCommand('Minimize', this)">
+            <svg viewBox="0 0 16 16">
+                <line class="icon-path" x1="2" y1="8" x2="14" y2="8" />
+            </svg>
+        </button>
+
+        <button class="btn btn-maximize" id="maxBtn" onclick="toggleMaximize(this)">
+            <svg class="icon-max" viewBox="0 0 16 16">
+                <rect class="icon-path" x="2" y="2" width="12" height="12" rx="2.5" ry="2.5" />
+            </svg>
+            <svg class="icon-restore" viewBox="0 0 16 16">
+                <path class="icon-path" d="M5 4V2.5A1 1 0 0 1 6 1.5h7.5a1 1 0 0 1 1 1V10a1 1 0 0 1-1 1H12" />
+                <rect class="icon-path" x="1.5" y="5" width="9.5" height="9.5" rx="1" ry="1" />
+            </svg>
+        </button>
+
+        <button class="btn btn-close" onclick="sendCommand('Close', this)">
+            <svg viewBox="0 0 17 17">
+                <line class="icon-path" x1="3.5" y1="3.5" x2="13.5" y2="13.5" />
+                <line class="icon-path" x1="13.5" y1="3.5" x2="3.5" y2="13.5" />
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        const maxBtn = document.getElementById('maxBtn');
+
+        function startDrag(e) {
+            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'svg' && e.target.tagName !== 'line' && e.target.tagName !== 'rect' && e.target.tagName !== 'path') {
+                sendCommand('DragWindow');
+            }
+        }
+
+        function toggleMaximize(btnEl) {
+            btnEl.blur();
+            suppressHover(btnEl);
+
+            if (maxBtn.classList.contains('maximized')) {
+                updateMaximizeIcon(false);
+                sendCommand('Restore');
+            } else {
+                updateMaximizeIcon(true);
+                sendCommand('Maximize');
+            }
+        }
+
+        function updateMaximizeIcon(isMaximized) {
+            if (isMaximized) {
+                maxBtn.classList.add('maximized');
+            } else {
+                maxBtn.classList.remove('maximized');
+            }
+        }
+
+        function sendCommand(command, btnEl) {
+            if (btnEl) {
+                btnEl.blur();
+                suppressHover(btnEl);
+            }
+
+            if (window.chrome && window.chrome.webview) {
+                window.chrome.webview.postMessage(command);
+            } else {
+                console.log(command);
+            }
+        }
+
+        const allBtns = Array.prototype.slice.call(document.querySelectorAll('.btn'));
+        const suppressedBtns = new Set();
+
+        function suppressHover(btnEl) {
+            btnEl.classList.remove('is-hover');
+            suppressedBtns.add(btnEl);
+        }
+
+        function syncHoverState() {
+            for (let i = 0; i < allBtns.length; i++) {
+                const btnEl = allBtns[i];
+                const actuallyHovering = btnEl.matches(':hover');
+
+                if (suppressedBtns.has(btnEl)) {
+                    if (actuallyHovering) {
+                        continue;
+                    }
+                    suppressedBtns.delete(btnEl);
+                }
+
+                const shouldHover = actuallyHovering;
+                const isHovering = btnEl.classList.contains('is-hover');
+
+                if (shouldHover && !isHovering) {
+                    btnEl.classList.add('is-hover');
+                } else if (!shouldHover && isHovering) {
+                    btnEl.classList.remove('is-hover');
+                }
+            }
+            requestAnimationFrame(syncHoverState);
+        }
+
+        requestAnimationFrame(syncHoverState);
+
+        window.addEventListener('message', function (event) {
+            if (event.data === 'OnMaximized') {
+                updateMaximizeIcon(true);
+            } else if (event.data === 'OnRestored') {
+                updateMaximizeIcon(false);
+            } else if (event.data && event.data.action === 'themeChanged') {
+                document.documentElement.setAttribute('data-theme', event.data.theme === 'light' ? 'light' : 'dark');
+            }
+        });
+    </script>
+
+</body>
+</html>

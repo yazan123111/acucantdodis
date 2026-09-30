@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script>
+        (function () {
+            try {
+                var saved = localStorage.getItem('app_theme');
+                var theme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+
+        (function () {
+            function applyTheme(theme) {
+                theme = (theme === 'light') ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                try {
+                    localStorage.setItem('app_theme', theme);
+                } catch (e) { }
+
+                try {
+                    window.dispatchEvent(new CustomEvent('themechange', {
+                        detail: {
+                            theme: theme
+                        }
+                    }));
+                } catch (e) { }
+
+                if (window.chrome && window.chrome.webview) {
+                    try {
+                        window.chrome.webview.postMessage({
+                            action: 'themeChanged',
+                            theme: theme
+                        });
+                    } catch (e) { }
+                }
+            }
+
+            window.ThemeAPI = {
+                setDark: function () {
+                    applyTheme('dark');
+                },
+                setLight: function () {
+                    applyTheme('light');
+                },
+                toggle: function () {
+                    const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                    applyTheme(cur === 'light' ? 'dark' : 'light');
+                },
+                getTheme: function () {
+                    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                }
+            };
+        })();
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --sc1: #0c0c0c;
+            --sc2: rgba(200, 200, 200, 1.0);
+            --sc3: rgba(29, 29, 29, 1.0);
+            --sc4: #fff;
+            --sc5: #a1a1aa;
+            --sc6: rgba(155, 155, 155, 1.0);
+            --sc7: #151515;
+            --sc8: #f2f2f2;
+            --sc9: rgba(28, 28, 28, 1.0);
+            --sc10: rgba(225, 225, 225, 1.0);
+            --sc11: #585858;
+            --sc12: #787878;
+            --sc13: rgba(18, 18, 18, 1.0);
+            --sc14: rgba(45, 45, 45, 1.0);
+            --sc15: rgba(42, 42, 42, 1.0);
+            --sc16: #ffffff;
+            --sc17: rgba(48, 48, 48, 1.0);
+            --divider-sc: rgba(29, 29, 29, 1.0);
+            --sc18: rgba(255, 255, 255, 0.02);
+            --sc19: rgba(225, 225, 225, 0.95);
+            --sc20: rgba(120, 120, 120, 1.0);
+            --sc21: rgba(140, 140, 140, 1.0);
+            --sc22: rgba(92, 92, 92, 1.0);
+            --sc23: rgba(238, 238, 238, 1.0);
+            --sc24: rgba(18, 18, 18, 1.0);
+            --sc25: rgba(50, 50, 50, 1.0);
+            --sc26: rgba(220, 220, 220, 1.0);
+            --sc27: rgba(105, 105, 105, 1.0);
+            --sc28: rgba(35, 35, 35, 1.0);
+            --sc29: rgba(57, 57, 57, 1.0);
+            --sc30: rgba(205, 205, 205, 1.0);
+            --sc31: rgba(25, 25, 25, 1.0);
+            --sc32: rgba(190, 190, 190, 1.0);
+            --sc33: rgba(225, 225, 225, 1.0);
+            --sc34: rgba(15, 15, 15, 1.0);
+            --sc35: rgba(0, 0, 0, 0.5);
+            --sc36: rgba(245, 245, 245, 1.0);
+            --sc37: rgba(255, 255, 255, 0.08);
+            --sc38: rgba(0, 0, 0, 0.55);
+            --sc39: rgba(170, 170, 170, 1.0);
+            --sc40: rgba(24, 24, 24, 1.0);
+            --sc41: rgba(60, 60, 60, 1.0);
+            --sc42: rgba(90, 90, 90, 1.0);
+            --sc43: rgba(110, 110, 110, 1.0);
+            --sc44: rgba(190, 190, 190, 1.0);
+            --sc45: rgba(20, 20, 20, 1.0);
+            --sc46: rgba(46, 46, 46, 1.0);
+            --sc47: rgba(0, 0, 0, 0.45);
+            --sc48: rgba(32, 32, 32, 1.0);
+            --sc49: rgba(230, 230, 230, 1.0);
+            --sc50: rgba(240, 240, 240, 1.0);
+            --sc51: rgba(160, 160, 160, 1.0);
+
+            --nav-text-dim: #9a9a9a;
+            --nav-text-main: #f2f2f2;
+            --nav-tile-bg: rgba(255, 255, 255, 0.06);
+        }
+
+        [data-theme="light"] {
+            --sc1: rgba(243, 243, 243, 1.0);
+            --sc2: rgba(55, 55, 55, 1.0);
+            --sc3: rgba(225, 225, 225, 1.0);
+            --sc4: rgba(0, 0, 0, 1.0);
+            --sc5: rgba(94, 94, 85, 1.0);
+            --sc6: rgba(100, 100, 100, 1.0);
+            --sc7: rgba(234, 234, 234, 1.0);
+            --sc8: #1c1c1c;
+            --sc9: rgba(227, 227, 227, 1.0);
+            --sc10: rgba(30, 30, 30, 1.0);
+            --sc11: rgba(167, 167, 167, 1.0);
+            --sc12: rgba(135, 135, 135, 1.0);
+            --sc13: rgba(237, 237, 237, 1.0);
+            --sc14: rgba(210, 210, 210, 1.0);
+            --sc15: rgba(213, 213, 213, 1.0);
+            --sc16: rgba(0, 0, 0, 1.0);
+            --sc17: rgba(207, 207, 207, 1.0);
+            --divider-sc: rgba(225, 225, 225, 1.0);
+            --sc18: rgba(0, 0, 0, 0.02);
+            --sc19: rgba(30, 30, 30, 0.95);
+            --sc20: rgba(135, 135, 135, 1.0);
+            --sc21: rgba(115, 115, 115, 1.0);
+            --sc22: rgba(163, 163, 163, 1.0);
+            --sc23: rgba(17, 17, 17, 1.0);
+            --sc24: rgba(237, 237, 237, 1.0);
+            --sc25: rgba(205, 205, 205, 1.0);
+            --sc26: rgba(35, 35, 35, 1.0);
+            --sc27: rgba(150, 150, 150, 1.0);
+            --sc28: rgba(220, 220, 220, 1.0);
+            --sc29: rgba(198, 198, 198, 1.0);
+            --sc30: rgba(50, 50, 50, 1.0);
+            --sc31: rgba(230, 230, 230, 1.0);
+            --sc32: rgba(65, 65, 65, 1.0);
+            --sc33: rgba(30, 30, 30, 1.0);
+            --sc34: rgba(240, 240, 240, 1.0);
+            --sc35: rgba(0, 0, 0, 0.5);
+            --sc36: rgba(10, 10, 10, 1.0);
+            --sc37: rgba(255, 255, 255, 0.08);
+            --sc38: rgba(0, 0, 0, 0.55);
+            --sc39: rgba(85, 85, 85, 1.0);
+            --sc40: rgba(231, 231, 231, 1.0);
+            --sc41: rgba(195, 195, 195, 1.0);
+            --sc42: rgba(165, 165, 165, 1.0);
+            --sc43: rgba(145, 145, 145, 1.0);
+            --sc44: rgba(65, 65, 65, 1.0);
+            --sc45: rgba(235, 235, 235, 1.0);
+            --sc46: rgba(209, 209, 209, 1.0);
+            --sc47: rgba(0, 0, 0, 0.45);
+            --sc48: rgba(223, 223, 223, 1.0);
+            --sc49: rgba(25, 25, 25, 1.0);
+            --sc50: rgba(15, 15, 15, 1.0);
+            --sc51: rgba(95, 95, 95, 1.0);
+
+            --nav-text-dim: #767676;
+            --nav-text-main: #1c1c1c;
+            --nav-tile-bg: rgba(255, 255, 255, 0.55);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        * {
+            font-family: "Quicksand", "Inter", "Microsoft JhengHei", "PingFang TC", sans-serif;
+            cursor: default;
+            -webkit-text-stroke: 0.35px currentColor;
+        }
+
+        .sidebar, .sidebar * {
+            -webkit-text-stroke: 0px currentColor;
+        }
+
+        .pages-viewport, .pages-viewport * {
+            -webkit-text-stroke: 0.2px currentColor;
+        }
+
+        #notification-container, #notification-container * {
+            -webkit-text-stroke: 0px currentColor;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            background-color: var(--sc1);
+            color: var(--sc2);
+            height: 100vh;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            user-select: none;
+            border-top: 0.5px solid var(--divider-sc);
+        }
+
+        .sidebar {
+            width: 248px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--sc3);
+            padding: 16px 16px 0 16px;
+            opacity: 0;
+            transform: translateX(-40px);
+        }
+
+        .brand {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0;
+            color: var(--sc4);
+            padding: 4px 8px 20px 8px;
+            flex-shrink: 0;
+        }
+
+        .nav-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex-grow: 1;
+        }
+
+        button, .btn-secondary, .dropdown-trigger, .dropdown-option, .nav-btn, .switch, .range-input, label, [onclick] {
+            cursor: pointer;
+        }
+
+        button *, .btn-secondary *, .dropdown-trigger *, .dropdown-option *, .nav-btn *, label *, [onclick] * {
+            cursor: inherit;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 12px;
+            border-radius: 8px;
+            background: none;
+            border: none;
+            color: var(--nav-text-dim);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.18s ease;
+            text-align: left;
+            width: 100%;
+        }
+
+            .nav-btn:hover {
+                background: var(--nav-tile-bg);
+                color: var(--nav-text-main);
+            }
+
+            .nav-btn.active {
+                background: var(--nav-tile-bg);
+                color: var(--nav-text-main);
+            }
+
+            .nav-btn svg {
+                width: 17px !important;
+                height: 17px !important;
+                flex-shrink: 0;
+                color: currentColor;
+                transition: color 0.15s;
+            }
+
+            .nav-btn:hover svg {
+                color: currentColor;
+            }
+
+            .nav-btn.active svg {
+                color: currentColor;
+            }
+
+            .nav-btn span {
+                flex-grow: 1;
+            }
+
+        .pages-viewport {
+            flex-grow: 1;
+            height: 100%;
+            padding: 0;
+            overflow: hidden;
+            z-index: 9999;
+        }
+
+        .pages-track {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: var(--sc1);
+            overflow: hidden;
+            z-index: 9999;
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 2.5px;
+            width: auto;
+            height: 100%;
+            overflow-y: auto;
+            padding: 22px 27px 22px 26px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            opacity: 0;
+            transform: translateY(24px);
+            pointer-events: none;
+            transition: opacity .32s ease, transform .32s cubic-bezier(.22,1,.36,1);
+            z-index: 9999;
+        }
+
+            .page > * {
+                width: 100%;
+            }
+
+            ::-webkit-scrollbar {
+                width: 5px;
+                height: 5px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: rgba(140, 140, 140, 0.6);
+                border-radius: 100px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(140, 140, 140, 0.9);
+            }
+
+        .page-heading {
+            font-size: 21px;
+            font-weight: 600;
+            color: var(--sc16);
+            letter-spacing: -0.01em;
+            text-transform: none;
+            margin-bottom: 16px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+            .page-heading::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 3px;
+                bottom: 3px;
+                width: 3px;
+                border-radius: 2px;
+                background: var(--sc4);
+            }
+
+        .page.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            z-index: 2;
+        }
+
+        .page.leaving {
+            opacity: 0;
+            transform: translateY(24px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 28px;
+            padding: 10px 6px;
+            border-bottom: 1px solid var(--divider-sc);
+            transition: background 0.15s ease;
+        }
+
+            .setting-row:last-child {
+                border-bottom: none;
+            }
+
+            .setting-row:hover {
+                background: var(--sc18);
+            }
+
+        .setting-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 0;
+        }
+
+        .setting-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--sc19);
+            letter-spacing: 0;
+        }
+
+        body[data-lang="en"] .setting-title {
+            font-weight: 500;
+        }
+
+        .setting-desc {
+            font-family: 'Baloo 2', "Microsoft JhengHei", "PingFang TC", sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--sc20);
+            line-height: 1.5;
+        }
+
+        .setting-control {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .switch {
+            position: relative;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+            .switch .slider,
+            .switch .slider::before {
+                box-sizing: border-box;
+            }
+
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .switch .slider {
+                position: absolute;
+                cursor: pointer;
+                inset: 0;
+                background-color: var(--sc17);
+                border-radius: 999px;
+                transition: background-color 0.18s ease;
+            }
+
+                .switch .slider::before {
+                    content: "";
+                    position: absolute;
+                    height: 19px;
+                    width: 19px;
+                    left: 3.5px;
+                    top: 3.5px;
+                    background-color: var(--sc21);
+                    border-radius: 50%;
+                    transition: transform 0.18s ease, background-color 0.18s ease;
+                }
+
+            .switch input:checked + .slider {
+                background-color: var(--sc22);
+            }
+
+                .switch input:checked + .slider::before {
+                    transform: translateX(20px);
+                    background-color: var(--sc23);
+                }
+
+            .switch input:focus-visible + .slider {
+                outline: 1px solid var(--sc20);
+                outline-offset: 2px;
+            }
+
+            .switch input:disabled + .slider {
+                cursor: not-allowed;
+                opacity: 0.5;
+                filter: grayscale(1);
+            }
+
+        .num-input::-webkit-outer-spin-button,
+        .num-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .num-input {
+            width: 52px;
+            font-family: 'Baloo 2', "Microsoft JhengHei", "PingFang TC", sans-serif;
+            background: var(--sc24);
+            border: 1px solid var(--sc25);
+            color: var(--sc26);
+            border-radius: 6px;
+            padding: 5px 2px;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+            .num-input:focus {
+                border-color: var(--sc27);
+            }
+
+        .hotkey-input {
+            width: 100px;
+            min-width: 60px;
+            max-width: 260px;
+            box-sizing: border-box;
+            font-family: "Quicksand", "Microsoft JhengHei", "PingFang TC", sans-serif;
+            background: var(--sc24);
+            border: 1px solid var(--sc25);
+            color: var(--sc26);
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.15s ease, background 0.15s ease, width 0.12s ease;
+        }
+
+            .hotkey-input:hover {
+                border-color: var(--sc27);
+            }
+
+            .hotkey-input.recording {
+                border-color: var(--sc22);
+                color: var(--sc22);
+                animation: hotkeyPulse 1.1s ease-in-out infinite;
+            }
+
+        @keyframes hotkeyPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.55; }
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            font-family: "Quicksand", "Microsoft JhengHei", "PingFang TC", sans-serif;
+            background: var(--sc28);
+            border: 1px solid var(--sc29);
+            color: var(--sc30);
+            border-radius: 6px;
+            padding: 6px 13px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+            .btn-secondary:hover {
+                background: var(--sc31);
+            }
+
+        /* ===== Security panel (面板式卡片) ===== */
+        .security-panel {
+            display: flex;
+            gap: 16px;
+            padding: 18px;
+            margin-top: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--sc29);
+            background: var(--sc9);
+        }
+
+        .security-panel-icon {
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--sc18);
+            color: var(--sc4);
+        }
+
+            .security-panel-icon svg {
+                width: 22px;
+                height: 22px;
+            }
+
+        .security-panel-body {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .security-panel-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .security-panel-title {
+            font-size: 15.5px;
+            font-weight: 600;
+            color: var(--sc19);
+        }
+
+        .security-status {
+            flex-shrink: 0;
+            font-family: "Quicksand", "Microsoft JhengHei", "PingFang TC", sans-serif;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: var(--sc28);
+            color: var(--sc30);
+            white-space: nowrap;
+        }
+
+            .security-status[data-status="excluded"] {
+                background: rgba(70, 160, 100, 0.16);
+                color: #4caf6d;
+            }
+
+            .security-status[data-status="not-excluded"] {
+                background: rgba(210, 90, 90, 0.15);
+                color: #e0645f;
+            }
+
+        .security-panel-desc {
+            font-family: 'Baloo 2', "Microsoft JhengHei", "PingFang TC", sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--sc20);
+            line-height: 1.5;
+        }
+
+        .security-panel-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 2px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: "Quicksand", "Microsoft JhengHei", "PingFang TC", sans-serif;
+            background: var(--sc4);
+            color: var(--sc1);
+            border: none;
+            border-radius: 7px;
+            padding: 8px 16px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.15s ease, transform 0.1s ease;
+        }
+
+            .btn-primary svg {
+                width: 15px;
+                height: 15px;
+            }
+
+            .btn-primary:hover {
+                opacity: 0.85;
+            }
+
+            .btn-primary:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+        .range-wrap {
+            width: 180px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .range-input {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 1;
+            height: 20px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+            .range-input::-webkit-slider-runnable-track {
+                height: 4px;
+                background: var(--sc14);
+                border-radius: 999px;
+            }
+
+            .range-input::-moz-range-track {
+                height: 4px;
+                background: var(--sc14);
+                border-radius: 999px;
+                border: none;
+            }
+
+            .range-input::-moz-range-progress {
+                height: 4px;
+                background: var(--sc32);
+                border-radius: 999px;
+            }
+
+            .range-input::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: 15px;
+                height: 15px;
+                margin-top: -5.5px;
+                border-radius: 50%;
+                background: var(--sc33);
+                border: 2px solid var(--sc34);
+                box-shadow: 0 1px 4px var(--sc35);
+                transition: transform .15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .15s ease, background .15s ease;
+            }
+
+            .range-input::-moz-range-thumb {
+                width: 15px;
+                height: 15px;
+                border-radius: 50%;
+                background: var(--sc33);
+                border: 2px solid var(--sc34);
+                box-shadow: 0 1px 4px var(--sc35);
+                transition: transform .15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow .15s ease, background .15s ease;
+            }
+
+            .range-input:hover::-webkit-slider-thumb {
+                transform: scale(1.15);
+                background: var(--sc36);
+            }
+
+            .range-input:hover::-moz-range-thumb {
+                transform: scale(1.15);
+                background: var(--sc36);
+            }
+
+            .range-input:active::-webkit-slider-thumb {
+                transform: scale(1.25);
+                box-shadow: 0 0 0 6px var(--sc37), 0 2px 8px var(--sc38);
+            }
+
+            .range-input:active::-moz-range-thumb {
+                transform: scale(1.25);
+                box-shadow: 0 0 0 6px var(--sc37), 0 2px 8px var(--sc38);
+            }
+
+        .range-value {
+            min-width: 36px;
+            text-align: right;
+            font-family: "Quicksand", "Microsoft JhengHei", "PingFang TC", sans-serif;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--sc39);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .dropdown {
+            position: relative;
+            font-family: 'Baloo 2', "Microsoft JhengHei", "PingFang TC", sans-serif;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--sc24);
+            border: 1px solid var(--sc25);
+            color: var(--sc26);
+            border-radius: 6px;
+            padding: 7px 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            min-width: 130px;
+            justify-content: space-between;
+            transition: border-color 0.18s ease, background 0.18s ease;
+        }
+
+            .dropdown-trigger:hover {
+                background: var(--sc40);
+                border-color: var(--sc41);
+            }
+
+        .dropdown.open .dropdown-trigger {
+            border-color: var(--sc42);
+            background: var(--sc40);
+        }
+
+        .dropdown-trigger .chevron {
+            width: 15px;
+            height: 15px;
+            color: var(--sc43);
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            flex-shrink: 0;
+        }
+
+        .dropdown.open .dropdown-trigger .chevron {
+            transform: rotate(180deg);
+            color: var(--sc44);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 6px);
+            right: 0;
+            min-width: 150px;
+            background: var(--sc45);
+            border: 1px solid var(--sc46);
+            border-radius: 9px;
+            padding: 6px;
+            box-shadow: 0 12px 28px var(--sc47);
+            z-index: 20;
+            opacity: 0;
+            transform: translateY(-6px) scale(0.97);
+            pointer-events: none;
+            transform-origin: top right;
+            transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .dropdown.open .dropdown-menu {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .dropdown-menu.drop-up {
+            top: auto;
+            bottom: calc(100% + 6px);
+            transform-origin: bottom right;
+            transform: translateY(6px) scale(0.97);
+        }
+
+        .dropdown.open .dropdown-menu.drop-up {
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 11px;
+            border-radius: 6px;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--sc44);
+            cursor: pointer;
+            transition: background 0.12s ease, color 0.12s ease;
+        }
+
+            .dropdown-option:hover {
+                background: var(--sc48);
+                color: var(--sc49);
+            }
+
+            .dropdown-option.selected {
+                color: var(--sc50);
+                background: var(--sc37);
+            }
+
+            .dropdown-option .check {
+                width: 14px;
+                height: 14px;
+                color: var(--sc51);
+                opacity: 0;
+                transform: scale(0.6);
+                transition: opacity 0.12s ease, transform 0.12s ease;
+            }
+
+            .dropdown-option.selected .check {
+                opacity: 1;
+                transform: scale(1);
+            }
+    
+        :root {
+            --notif-bg: #ffffff;
+            --notif-text: #111111;
+            --notif-shadow-soft: rgba(0, 0, 0, 0.25);
+            --notif-shadow-strong: rgba(0, 0, 0, 0.3);
+            --notif-inset: rgba(0, 0, 0, 0.02);
+            --notif-track: rgba(0, 0, 0, 0.12);
+        }
+
+        [data-theme="light"] {
+            --notif-bg: rgba(0, 0, 0, 1.0);
+            --notif-text: rgba(238, 238, 238, 1.0);
+            --notif-shadow-soft: rgba(0, 0, 0, 0.25);
+            --notif-shadow-strong: rgba(0, 0, 0, 0.3);
+            --notif-inset: rgba(0, 0, 0, 0.02);
+            --notif-track: rgba(255, 255, 255, 0.12);
+        }
+
+        #notification-container {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+            width: max-content;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+            #notification-container.has-items {
+                pointer-events: auto;
+            }
+
+        .notification {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: max-content;
+            box-sizing: border-box;
+            min-width: 160px;
+            max-width: 320px;
+            padding: 14px 22px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--notif-bg);
+            border: none;
+            box-shadow: 0 10px 30px var(--notif-shadow-soft), inset 0 1px 0 var(--notif-inset);
+            color: var(--notif-text);
+            font-size: 14px;
+            font-weight: 400;
+            opacity: 0;
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.3;
+            letter-spacing: 0;
+
+            transform: translate(-50%, 40px);
+            z-index: 1;
+            overflow: hidden;
+            will-change: transform, opacity;
+            transition: transform 0.58s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+        }
+
+        .notification.show {
+            z-index: 30;
+            box-shadow: 0 16px 36px var(--notif-shadow-strong), inset 0 1px 0 var(--notif-inset);
+        }
+
+        #notification-container:not(.expanded) .notification.show[data-depth="1"] {
+            z-index: 20;
+        }
+
+        #notification-container:not(.expanded) .notification.show[data-depth="2"] {
+            z-index: 10;
+        }
+
+        .notification.hide {
+            pointer-events: none;
+            transition: opacity 0.45s ease-out;
+        }
+
+        #notification-container.expanded .notification.show {
+            z-index: 30;
+        }
+
+        .notification.has-progress {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            border-radius: 22px;
+            min-width: 260px;
+        }
+
+            .notification.has-progress::before,
+            .notification.has-progress::after {
+                border-radius: 22px;
+            }
+
+        .notif-top-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification-progress-container {
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notification-progress-track {
+            flex: 1;
+            height: 4px;
+            background: var(--notif-track);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .notification-progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--notif-text);
+            border-radius: 999px;
+            transition: width 0.1s linear;
+        }
+
+        .notification-progress-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--notif-text);
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+            min-width: 30px;
+            text-align: right;
+        }
+        /* ===== End Shared Progress Notification ===== */
+
+</style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <div class="brand" data-i18n="settings_title">Settings</div>
+
+        <div class="nav-container">
+            <button id="btn1" class="nav-btn active" onclick="switchTab(this, 1)">
+                <i data-lucide="sliders-horizontal"></i>
+                <span data-i18n="system"></span>
+            </button>
+            <button id="btn2" class="nav-btn" onclick="switchTab(this, 2)">
+                <i data-lucide="app-window"></i>
+                <span data-i18n="windows"></span>
+            </button>
+            <button id="btn3" class="nav-btn" onclick="switchTab(this, 3)">
+                <i data-lucide="file-pen-line"></i>
+                <span data-i18n="editor"></span>
+            </button>
+            <button id="btn4" class="nav-btn" onclick="switchTab(this, 4)">
+                <i data-lucide="folder-tree"></i>
+                <span data-i18n="explorer"></span>
+            </button>
+            <button id="btn5" class="nav-btn" onclick="switchTab(this, 5)">
+                <i data-lucide="gamepad-2"></i>
+                <span data-i18n="roblox"></span>
+            </button>
+            <button id="btn6" class="nav-btn" onclick="switchTab(this, 6)">
+                <i data-lucide="keyboard"></i>
+                <span data-i18n="hotkeys"></span>
+            </button>
+            <button id="btn7" class="nav-btn" onclick="switchTab(this, 7)">
+                <i data-lucide="shield"></i>
+                <span data-i18n="security">Security</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="pages-viewport" id="pagesViewport">
+        <div class="pages-track" id="pagesTrack">
+
+            <div class="page active" data-page="1">
+                <div class="page-heading" data-i18n="system">System</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="auto_update_title">Auto Update</div>
+                        <div class="setting-desc" data-i18n="auto_update_desc">Synchronize the latest version of Electra on startup</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AutoUpdate" checked disabled onchange="onToggle('AutoUpdate', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="auto_launch_title">Auto Launch on Startup</div>
+                        <div class="setting-desc" data-i18n="auto_launch_desc">Electra.exe will be executed automatically after the system boots up</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AutoLaunchOnStartup" onchange="onToggle('AutoLaunchOnStartup', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="discord_rpc_title">Discord RPC</div>
+                        <div class="setting-desc" data-i18n="discord_rpc_desc">Display your status on the Discord desktop</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="DiscordRPC" onchange="onToggle('DiscordRPC', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="language_title">Language</div>
+                        <div class="setting-desc" data-i18n="language_desc">Choose your primary language</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="dropdown" data-dropdown-key="Language">
+                            <button type="button" class="dropdown-trigger" onclick="toggleDropdown(this)">
+                                <span class="dropdown-label">English</span>
+                                <i data-lucide="chevron-down" class="chevron"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-option selected" data-value="en" onclick="selectOption(this, 'Language')">
+                                    <span>English</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option" data-value="zh" onclick="selectOption(this, 'Language')">
+                                    <span>繁體中文</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="page" data-page="2">
+                <div class="page-heading" data-i18n="windows">Windows</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="default_tab_title">預設分頁</div>
+                        <div class="setting-desc" data-i18n="default_tab_desc">設定程式啟動時預設顯示的分頁</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="dropdown" data-dropdown-key="DefaultTab">
+                            <button type="button" class="dropdown-trigger" onclick="toggleDropdown(this)">
+                                <span class="dropdown-label">Executor</span>
+                                <i data-lucide="chevron-down" class="chevron"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-option" data-value="Dashboard" onclick="selectOption(this, 'DefaultTab')">
+                                    <span data-i18n="tab_home">Home</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option selected" data-value="Executor" onclick="selectOption(this, 'DefaultTab')">
+                                    <span data-i18n="tab_executor">Executor</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option" data-value="ScriptHub" onclick="selectOption(this, 'DefaultTab')">
+                                    <span data-i18n="tab_scripthub">ScriptHub</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option" data-value="Settings" onclick="selectOption(this, 'DefaultTab')">
+                                    <span data-i18n="tab_settings">Settings</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="appearance_title">Appearance</div>
+                        <div class="setting-desc" data-i18n="appearance_desc">Switch between dark and light theme</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="dropdown" data-dropdown-key="Theme">
+                            <button type="button" class="dropdown-trigger" onclick="toggleDropdown(this)">
+                                <span class="dropdown-label">Dark</span>
+                                <i data-lucide="chevron-down" class="chevron"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-option" data-value="device" onclick="selectOption(this, 'Theme')">
+                                    <span data-i18n="theme_device">Device</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option selected" data-value="dark" onclick="selectOption(this, 'Theme')">
+                                    <span data-i18n="theme_dark">Dark</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option" data-value="light" onclick="selectOption(this, 'Theme')">
+                                    <span data-i18n="theme_light">Light</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="always_on_top_title">Always On Top</div>
+                        <div class="setting-desc" data-i18n="always_on_top_desc">Set the Electra window to the topmost position</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AlwaysOnTop" onchange="onToggle('AlwaysOnTop', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="auto_save_pos_title">Auto Save Windows Position</div>
+                        <div class="setting-desc" data-i18n="auto_save_pos_desc">Automatically saves and loads the window position upon opening</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AutoSaveWindowPosition" onchange="onToggle('AutoSaveWindowPosition', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="save_win_size_title">Save Windows Size</div>
+                        <div class="setting-desc" data-i18n="save_win_size_desc">Store the window size for faster loading</div>
+                    </div>
+                    <div class="setting-control btn-group">
+                        <button class="btn-secondary" onclick="onAction('ResetWindowSize')" data-i18n="reset_btn">Reset</button>
+                        <button class="btn-secondary" onclick="onAction('UpdateWindowSize')" data-i18n="update_size_btn">Update Size</button>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="anti_screen_title">Anti - Screen Recorder</div>
+                        <div class="setting-desc" data-i18n="anti_screen_desc">Avoid detection by all screen recording / video software</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AntiScreenRecorder" onchange="onToggle('AntiScreenRecorder', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="acrylic_blur_title">Acrylic Blur</div>
+                        <div class="setting-desc" data-i18n="acrylic_blur_desc">Apply a Windows acrylic blur effect to the window background</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AcrylicBlur" onchange="onToggle('AcrylicBlur', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="window_opacity_title">Window Opacity</div>
+                        <div class="setting-desc" data-i18n="window_opacity_desc">Adjust the window's opacity</div>
+                    </div>
+                    <div class="setting-control range-wrap">
+                        <input type="range" class="range-input" min="20" max="100" step="1"
+                               data-key="WindowOpacity" value="100"
+                               oninput="onRangeInput(this)">
+                        <span class="range-value" id="WindowOpacityValue">100%</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="page" data-page="3">
+                <div class="page-heading" data-i18n="editor">Editor</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="auto_save_script_title">Auto Save Script</div>
+                        <div class="setting-desc" data-i18n="auto_save_script_desc">Automatically save editor scripts and load them automatically next time</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AutoSaveScript" onchange="onToggle('AutoSaveScript', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="mini_map_title">Mini Map</div>
+                        <div class="setting-desc" data-i18n="mini_map_desc">Display a minimap on the right side of the editor</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="MiniMap" onchange="onToggle('MiniMap', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="left_mini_map_title">Left MiniMap</div>
+                        <div class="setting-desc" data-i18n="left_mini_map_desc">Display the minimap on the left side of the editor instead of the right</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="LeftMiniMap" onchange="onToggle('LeftMiniMap', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="word_wrap_title">Word Wrap</div>
+                        <div class="setting-desc" data-i18n="word_wrap_desc">Automatically wraps long lines of code so they stay within the editor width</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="WordWrap" onchange="onToggle('WordWrap', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="line_number_title">Line Number</div>
+                        <div class="setting-desc" data-i18n="line_number_desc">Determines whether to display the line numbers to the left of Monaco</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="LineNumber" onchange="onToggle('LineNumber', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="font_title">Font</div>
+                        <div class="setting-desc" data-i18n="font_desc">Choose the font family used in the Monaco editor</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="dropdown" data-dropdown-key="Font">
+                            <button type="button" class="dropdown-trigger" onclick="toggleDropdown(this)">
+                                <span class="dropdown-label">JetBrains Mono</span>
+                                <i data-lucide="chevron-down" class="chevron"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-option" data-value="Consolas" onclick="selectOption(this, 'Font')">
+                                    <span>Consolas</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option" data-value="Cascadia Code" onclick="selectOption(this, 'Font')">
+                                    <span>Cascadia Code</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option" data-value="Fira Code" onclick="selectOption(this, 'Font')">
+                                    <span>Fira Code</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option selected" data-value="JetBrains Mono" onclick="selectOption(this, 'Font')">
+                                    <span>JetBrains Mono</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option" data-value="Source Code Pro" onclick="selectOption(this, 'Font')">
+                                    <span>Source Code Pro</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option" data-value="Courier New" onclick="selectOption(this, 'Font')">
+                                    <span>Courier New</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="font_size_title">Font Size</div>
+                        <div class="setting-desc" data-i18n="font_size_desc">Enter numbers in the TextBox to adjust the Monaco text size</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="num-input" data-key="FontSize" value="15" min="8" max="40"
+                               onchange="onValueChange('FontSize', this.value)">
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="meteor_effect_title">MeteorEffect</div>
+                        <div class="setting-desc" data-i18n="meteor_effect_desc">Enables the meteor background effect, adding animated falling stars to the editor</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="MeteorEffect" onchange="onToggle('MeteorEffect', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="page" data-page="4">
+                <div class="page-heading" data-i18n="explorer">Explorer</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="show_explorer_title">Show Explorer</div>
+                        <div class="setting-desc" data-i18n="show_explorer_desc">Display the file Explorer panel</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="ShowExplorer" onchange="onToggle('ShowExplorer', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="explorer_position_title">Explorer Position</div>
+                        <div class="setting-desc" data-i18n="explorer_position_desc">Choose which side of the editor the file Explorer appears on</div>
+                    </div>
+                    <div class="setting-control">
+                        <div class="dropdown" data-dropdown-key="ExplorerPosition">
+                            <button type="button" class="dropdown-trigger" onclick="toggleDropdown(this)">
+                                <span class="dropdown-label">Left</span>
+                                <i data-lucide="chevron-down" class="chevron"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <div class="dropdown-option selected" data-value="left" onclick="selectOption(this, 'ExplorerPosition')">
+                                    <span data-i18n="position_left">Left</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                                <div class="dropdown-option" data-value="right" onclick="selectOption(this, 'ExplorerPosition')">
+                                    <span data-i18n="position_right">Right</span>
+                                    <i data-lucide="check" class="check"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="auto_refresh_explorer_title">Auto Refresh Explorer</div>
+                        <div class="setting-desc" data-i18n="auto_refresh_explorer_desc">Automatically refresh the Explorer panel when files change</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AutoRefreshExplorer" onchange="onToggle('AutoRefreshExplorer', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="auto_refresh_interval_title">Auto Refresh Interval</div>
+                        <div class="setting-desc" data-i18n="auto_refresh_interval_desc">How often (in seconds) the Explorer panel automatically refreshes</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" class="num-input" data-key="AutoRefreshInterval" value="5" min="1" max="300"
+                               onchange="onValueChange('AutoRefreshInterval', this.value)">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="page" data-page="5">
+                <div class="page-heading" data-i18n="roblox">Roblox</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="auto_launch_roblox_title">Auto Launch Roblox</div>
+                        <div class="setting-desc" data-i18n="auto_launch_roblox_desc">Automatically opens Roblox when Electra starts</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AutoLaunchRoblox" onchange="onToggle('AutoLaunchRoblox', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="auto_attach_title">Auto Attach</div>
+                        <div class="setting-desc" data-i18n="auto_attach_desc">Automatically injected into the game when Roblox starts</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AutoAttach" onchange="onToggle('AutoAttach', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="fps_unlocker_title">FPS Unlocker</div>
+                        <div class="setting-desc" data-i18n="fps_unlocker_desc">Breaking the FPS limit of Roblox to 240fps</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="FpsUnlocker" onchange="onToggle('FpsUnlocker', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="crash_detection_title">Roblox Crash Detection</div>
+                        <div class="setting-desc" data-i18n="crash_detection_desc">Detect when Roblox crashes and notify Electra</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="CrashDetection" onchange="onToggle('CrashDetection', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="page" data-page="6">
+                <div class="page-heading" data-i18n="hotkeys">Hotkeys</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="execute_hotkey_title">Execute Script Hotkey</div>
+                        <div class="setting-desc" data-i18n="execute_hotkey_desc">Press the hotkey anywhere to trigger Execute</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="text" class="hotkey-input" data-key="ExecuteHotkey" value="Ctrl+Enter" readonly
+                               placeholder="Press keys..." onclick="startHotkeyCapture(this)">
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="quick_attach_hotkey_title">Quick Attach Hotkey</div>
+                        <div class="setting-desc" data-i18n="quick_attach_hotkey_desc">Press the hotkey anywhere to instantly attach to Roblox</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="text" class="hotkey-input" data-key="AttachHotkey" value="Ctrl+Shift+A" readonly
+                               placeholder="Press keys..." onclick="startHotkeyCapture(this)">
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="kill_roblox_hotkey_title">Kill Roblox Hotkey</div>
+                        <div class="setting-desc" data-i18n="kill_roblox_hotkey_desc">Press the hotkey anywhere to instantly close Roblox</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="text" class="hotkey-input" data-key="KillRobloxHotkey" value="Ctrl+Shift+K" readonly
+                               placeholder="Press keys..." onclick="startHotkeyCapture(this)">
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="boss_key_title">Boss Key</div>
+                        <div class="setting-desc" data-i18n="boss_key_desc">Instantly hide or restore the Electra window (taskbar icon stays, no animation)</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="text" class="hotkey-input" data-key="BossKeyHotkey" value="Ctrl+Alt+Q" readonly
+                               placeholder="Press keys..." onclick="startHotkeyCapture(this)">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="page" data-page="7">
+                <div class="page-heading" data-i18n="security">Security</div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="av_alert_title">偵測防毒提示</div>
+                        <div class="setting-desc" data-i18n="av_alert_desc">當系統偵測到可能造成衝突的防毒軟體時，顯示提醒通知</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="AntivirusDetectionAlert" onchange="onToggle('AntivirusDetectionAlert', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <div class="setting-title" data-i18n="defender_alert_title">Windows Defender 提示</div>
+                        <div class="setting-desc" data-i18n="defender_alert_desc">當系統偵測到 Windows Defender 可能造成衝突時，顯示提醒通知</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" data-key="WindowsDefenderAlert" onchange="onToggle('WindowsDefenderAlert', this.checked)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="security-panel">
+                    <div class="security-panel-icon">
+                        <i data-lucide="shield-plus"></i>
+                    </div>
+                    <div class="security-panel-body">
+                        <div class="security-panel-top">
+                            <div class="security-panel-title" data-i18n="defender_exclusion_title">加入 Windows Defender 排除清單</div>
+                        </div>
+                        <div class="security-panel-desc" data-i18n="defender_exclusion_desc">
+                            將本程式的安裝路徑加入 Windows Defender 排除清單，避免因誤判而遭到攔截或刪除。此操作需要系統管理員權限。
+                        </div>
+                        <div class="security-panel-footer">
+                            <button class="btn-primary" id="defenderBtn" onclick="onAddDefenderExclusion(this)">
+                                <i data-lucide="shield-check"></i>
+                                <span data-i18n="defender_exclusion_btn">一鍵加入排除清單</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const pageCount = 7;
+
+        function switchTab(btn, index) {
+            if (btn.classList.contains('active')) return;
+
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const target = document.querySelector(`.page[data-page="${index}"]`);
+            const current = document.querySelector('.page.active');
+            if (!target || target === current) return;
+
+            if (current) {
+                current.classList.remove('active');
+                current.classList.add('leaving');
+                setTimeout(() => current.classList.remove('leaving'), 320);
+            }
+
+            void target.offsetWidth;
+            target.classList.add('active');
+        }
+
+        function onToggle(key, checked) {
+            sendToHost({ type: 'toggle', key: key, value: checked });
+        }
+
+        function onValueChange(key, value) {
+            if (key === 'Theme') {
+                if (value === 'light') ThemeAPI.setLight();
+                else if (value === 'dark') ThemeAPI.setDark();
+            }
+            sendToHost({ type: 'value', key: key, value: value });
+        }
+
+        function onRangeInput(input) {
+            const label = document.getElementById(input.getAttribute('data-key') + 'Value');
+            if (label) label.textContent = input.value + '%';
+            onValueChange(input.getAttribute('data-key'), input.value);
+        }
+
+        function onAction(action) {
+            sendToHost({ type: 'action', key: action });
+        }
+
+        function onAddDefenderExclusion(btn) {
+            btn.disabled = true;
+            sendToHost({ type: 'action', key: 'AddDefenderExclusion' });
+        }
+
+        function getText(key) {
+            const lang = window.LanguageAPI ? window.LanguageAPI.get() : "en";
+            const t = translations[lang] || translations.en;
+            return t[key] || key;
+        }
+
+        function applyDefenderStatus(el, isExcluded) {
+            if (!el) return;
+            const key = isExcluded ? 'status_excluded' : 'status_not_excluded';
+            el.dataset.status = isExcluded ? 'excluded' : 'not-excluded';
+            el.setAttribute('data-i18n', key);
+            el.textContent = getText(key);
+        }
+
+        window.onDefenderExclusionResult = function (success, message) {
+            const btn = document.getElementById('defenderBtn');
+            const status = document.getElementById('defenderStatus');
+            if (btn) btn.disabled = false;
+
+            applyDefenderStatus(status, success);
+        };
+
+        window.setDefenderStatus = function (status) {
+            const el = document.getElementById('defenderStatus');
+            applyDefenderStatus(el, status === 'excluded');
+        };
+
+        function sendToHost(payload) {
+            if (window.chrome?.webview) {
+                window.chrome.webview.postMessage(JSON.stringify(payload));
+            }
+        }
+
+        let _hotkeyCaptureEl = null;
+        let _hotkeyPrevValue = '';
+
+        const HOTKEY_KEY_NAME_MAP = {
+            ' ': 'Space', 'Control': 'Ctrl', 'Meta': 'Win', 'Escape': 'Esc',
+            'ArrowUp': 'Up', 'ArrowDown': 'Down', 'ArrowLeft': 'Left', 'ArrowRight': 'Right',
+            'Delete': 'Del', 'Insert': 'Ins', 'PageUp': 'PageUp', 'PageDown': 'PageDown'
+        };
+
+        let _hotkeyMeasureCanvas = null;
+        function measureHotkeyText(el, text) {
+            if (!_hotkeyMeasureCanvas) _hotkeyMeasureCanvas = document.createElement('canvas');
+            const ctx = _hotkeyMeasureCanvas.getContext('2d');
+            const cs = getComputedStyle(el);
+            ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+            return ctx.measureText(text || '').width;
+        }
+
+        function updateHotkeyInputWidth(el) {
+            const text = el.value || el.placeholder || '';
+            const cs = getComputedStyle(el);
+            const paddingH = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+            const borderH = parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth);
+            const textWidth = measureHotkeyText(el, text);
+            const extra = 6; 
+            const desired = Math.ceil(textWidth + paddingH + borderH + extra);
+            const minW = parseFloat(cs.minWidth) || 0;
+            const maxW = parseFloat(cs.maxWidth) || Infinity;
+            el.style.width = Math.min(Math.max(desired, minW), maxW) + 'px';
+        }
+
+        function initHotkeyInputWidths() {
+            document.querySelectorAll('.hotkey-input').forEach(updateHotkeyInputWidth);
+        }
+        document.addEventListener('DOMContentLoaded', initHotkeyInputWidths);
+        window.addEventListener('themechange', initHotkeyInputWidths);
+
+        function startHotkeyCapture(inputEl) {
+            if (_hotkeyCaptureEl) stopHotkeyCapture(false);
+
+            _hotkeyCaptureEl = inputEl;
+            _hotkeyPrevValue = inputEl.value;
+            inputEl.value = '';
+            inputEl.placeholder = 'Press keys...';
+            inputEl.classList.add('recording');
+            updateHotkeyInputWidth(inputEl);
+
+            document.addEventListener('keydown', onHotkeyKeydown, true);
+            document.addEventListener('mousedown', onHotkeyOutsideClick, true);
+        }
+
+        function stopHotkeyCapture(restorePrev) {
+            if (!_hotkeyCaptureEl) return;
+
+            _hotkeyCaptureEl.classList.remove('recording');
+            if (restorePrev && !_hotkeyCaptureEl.value) {
+                _hotkeyCaptureEl.value = _hotkeyPrevValue;
+            }
+            updateHotkeyInputWidth(_hotkeyCaptureEl);
+
+            document.removeEventListener('keydown', onHotkeyKeydown, true);
+            document.removeEventListener('mousedown', onHotkeyOutsideClick, true);
+            _hotkeyCaptureEl = null;
+        }
+
+        function onHotkeyOutsideClick(e) {
+            if (_hotkeyCaptureEl && e.target !== _hotkeyCaptureEl) {
+                stopHotkeyCapture(true);
+            }
+        }
+
+        function onHotkeyKeydown(e) {
+            if (!_hotkeyCaptureEl) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            if (e.key === 'Escape') {
+                stopHotkeyCapture(true);
+                return;
+            }
+
+            if (e.key === 'Backspace' || e.key === 'Delete') {
+                const el = _hotkeyCaptureEl;
+                const key = el.getAttribute('data-key');
+                el.value = '';
+                stopHotkeyCapture(false);
+                updateHotkeyInputWidth(el);
+                onValueChange(key, '');
+                return;
+            }
+
+            const isModifierOnly = ['Control', 'Shift', 'Alt', 'Meta'].includes(e.key);
+            if (isModifierOnly) return;
+
+            const parts = [];
+            if (e.ctrlKey) parts.push('Ctrl');
+            if (e.altKey) parts.push('Alt');
+            if (e.shiftKey) parts.push('Shift');
+            if (e.metaKey) parts.push('Win');
+
+            let keyName = HOTKEY_KEY_NAME_MAP[e.key] || e.key;
+            if (keyName.length === 1) keyName = keyName.toUpperCase();
+            parts.push(keyName);
+
+            const combo = parts.join('+');
+            const el = _hotkeyCaptureEl;
+            el.value = combo;
+            updateHotkeyInputWidth(el);
+
+            const key = el.getAttribute('data-key');
+            stopHotkeyCapture(false);
+            onValueChange(key, combo);
+        }
+
+
+        function toggleDropdown(triggerBtn) {
+            const dropdown = triggerBtn.closest('.dropdown');
+            const isOpen = dropdown.classList.contains('open');
+
+            document.querySelectorAll('.dropdown.open').forEach(d => {
+                d.classList.remove('open');
+                const m = d.querySelector('.dropdown-menu');
+                if (m) m.classList.remove('drop-up');
+            });
+
+            if (!isOpen) {
+                const menu = dropdown.querySelector('.dropdown-menu');
+
+                if (menu) {
+                    menu.classList.remove('drop-up');
+                    const triggerRect = triggerBtn.getBoundingClientRect();
+                    const menuHeight = menu.offsetHeight;
+                    const spaceBelow = window.innerHeight - triggerRect.bottom;
+                    const spaceAbove = triggerRect.top;
+
+                    if (spaceBelow < menuHeight + 12 && spaceAbove > spaceBelow) {
+                        menu.classList.add('drop-up');
+                    }
+                }
+
+                dropdown.classList.add('open');
+            }
+        }
+
+        function selectOption(optionEl, key) {
+            const dropdown = optionEl.closest('.dropdown');
+            const value = optionEl.getAttribute('data-value');
+            const label = optionEl.querySelector('span').textContent;
+
+            dropdown.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
+            optionEl.classList.add('selected');
+
+            dropdown.querySelector('.dropdown-label').textContent = label;
+            dropdown.classList.remove('open');
+
+            onValueChange(key, value);
+        }
+
+        function setDropdownValue(key, value) {
+            const dropdown = document.querySelector(`[data-dropdown-key="${key}"]`);
+            if (!dropdown) return;
+
+            const option = dropdown.querySelector(`.dropdown-option[data-value="${value}"]`);
+            if (!option) return;
+
+            dropdown.querySelectorAll('.dropdown-option').forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+            dropdown.querySelector('.dropdown-label').textContent = option.querySelector('span').textContent;
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown.open').forEach(d => d.classList.remove('open'));
+            }
+        });
+
+        function applySettingsFromHost(settings) {
+            Object.entries(settings).forEach(([key, val]) => {
+                if (key === 'AutoUpdate') return;
+
+                if (key === 'Theme') {
+                    setDropdownValue('Theme', val);
+                    return;
+                }
+
+                const dropdown = document.querySelector(`[data-dropdown-key="${key}"]`);
+                if (dropdown) {
+                    setDropdownValue(key, val);
+                    return;
+                }
+
+                const el = document.querySelector(`[data-key="${key}"]`);
+                if (!el) return;
+
+                if (el.type === 'checkbox') {
+                    el.checked = Boolean(val);
+                } else {
+                    el.value = val;
+                    if (el.type === 'range') {
+                        const label = document.getElementById(key + 'Value');
+                        if (label) label.textContent = val + '%';
+                    }
+                }
+            });
+        }
+
+        if (window.chrome?.webview) {
+            window.chrome.webview.addEventListener("message", event => {
+                const msg = event.data;
+
+                if (typeof msg === 'string' && msg.startsWith("lang:")) {
+                    LanguageAPI.set(msg.split(":")[1]);
+                    return;
+                }
+
+                if (typeof msg === 'string' && msg.startsWith("theme:")) {
+                    const t = msg.split(":")[1];
+                    if (t === 'light') ThemeAPI.setLight();
+                    else ThemeAPI.setDark();
+                    return;
+                }
+
+                if (typeof msg === 'string' && msg.startsWith("init:")) {
+                    try {
+                        const settings = JSON.parse(msg.slice(5));
+                        applySettingsFromHost(settings);
+                    } catch (err) {
+                        console.error("init parse error", err);
+                    }
+                    return;
+                }
+
+                if (typeof msg === 'object' && msg !== null) {
+                    applySettingsFromHost(msg);
+                }
+            });
+        }
+
+        const translations = {
+            en: {
+                settings_title: "Settings",
+                system: "System",
+                roblox: "Roblox",
+                windows: "Windows",
+                default_tab_title: "Default Tab",
+                default_tab_desc: "Set the tab shown by default when the app launches",
+                tab_home: "Home",
+                tab_executor: "Executor",
+                tab_scripthub: "ScriptHub",
+                tab_settings: "Settings",
+                editor: "Editor",
+                explorer: "Explorer",
+                hotkeys: "Hotkeys",
+
+                execute_hotkey_title: "Execute Script Hotkey",
+                execute_hotkey_desc: "Press the hotkey anywhere to trigger Execute",
+                kill_roblox_hotkey_title: "Kill Roblox Hotkey",
+                kill_roblox_hotkey_desc: "Press the hotkey anywhere to instantly close Roblox",
+                boss_key_title: "Boss Key",
+                boss_key_desc: "Instantly hide or restore the Electra window (taskbar icon stays, no animation)",
+                quick_attach_hotkey_title: "Quick Attach Hotkey",
+                quick_attach_hotkey_desc: "Press the hotkey anywhere to instantly attach to Roblox",
+
+                auto_update_title: "Auto Update",
+                auto_update_desc: "Synchronize the latest version of Electra on startup",
+                auto_launch_title: "Auto Launch on Startup",
+                auto_launch_desc: "Electra.exe will be executed automatically after the system boots up",
+                auto_launch_roblox_title: "Auto Launch Roblox",
+                auto_launch_roblox_desc: "Automatically opens Roblox when Electra starts",
+                auto_attach_title: "Auto Attach",
+                auto_attach_desc: "Automatically injected into the game when Roblox starts",
+                fps_unlocker_title: "FPS Unlocker",
+                fps_unlocker_desc: "Breaking the FPS limit of Roblox to 240fps",
+                crash_detection_title: "Roblox Crash Detection",
+                crash_detection_desc: "Detect when Roblox crashes and notify Electra",
+                language_title: "Language",
+                language_desc: "Choose your primary language",
+
+                always_on_top_title: "Always On Top",
+                always_on_top_desc: "Set the Electra window to the topmost position",
+                appearance_title: "Appearance",
+                appearance_desc: "Switch between dark, light, or match your device theme",
+                theme_dark: "Dark",
+                theme_light: "Light",
+                theme_device: "Device",
+                auto_save_pos_title: "Auto Save Windows Position",
+                auto_save_pos_desc: "Automatically saves and loads the window position upon opening",
+                save_win_size_title: "Save Windows Size",
+                save_win_size_desc: "Store the window size for faster loading",
+                reset_btn: "Reset",
+                update_size_btn: "Update Size",
+                anti_screen_title: "Anti - Screen Recorder",
+                anti_screen_desc: "Avoid detection by all screen recording / video software",
+                discord_rpc_title: "Discord RPC",
+                discord_rpc_desc: "Display your status on the Discord desktop",
+                acrylic_blur_title: "Acrylic Blur",
+                acrylic_blur_desc: "Apply a Windows acrylic blur effect to the window background",
+                window_opacity_title: "Window Opacity",
+                window_opacity_desc: "Adjust the window's opacity",
+
+                auto_save_script_title: "Auto Save Script",
+                auto_save_script_desc: "Automatically save editor scripts and load them automatically next time",
+                mini_map_title: "Mini Map",
+                mini_map_desc: "Display a minimap on the right side of the editor",
+                left_mini_map_title: "Left MiniMap",
+                left_mini_map_desc: "Display the minimap on the left side of the editor instead of the right",
+                word_wrap_title: "Word Wrap",
+                word_wrap_desc: "Automatically wraps long lines of code so they stay within the editor width",
+                line_number_title: "Line Number",
+                line_number_desc: "Determines whether to display the line numbers to the left of Monaco",
+                font_title: "Font",
+                font_desc: "Choose the font family used in the Monaco editor",
+                font_size_title: "Font Size",
+                font_size_desc: "Enter numbers in the TextBox to adjust the Monaco text size",
+                meteor_effect_title: "MeteorEffect",
+                meteor_effect_desc: "Enables the meteor background effect, adding animated falling stars to the editor",
+
+                show_explorer_title: "Show Explorer",
+                show_explorer_desc: "Display the file Explorer panel",
+                auto_refresh_explorer_title: "Auto Refresh Explorer",
+                auto_refresh_explorer_desc: "Automatically refresh the Explorer panel when files change",
+                auto_refresh_interval_title: "Auto Refresh Interval",
+                auto_refresh_interval_desc: "How often (in seconds) the Explorer panel automatically refreshes",
+                explorer_position_title: "Explorer Position",
+                explorer_position_desc: "Choose which side of the editor the file Explorer appears on",
+                position_left: "Left",
+                position_right: "Right",
+
+                security: "Security",
+                av_alert_title: "Antivirus Alert",
+                av_alert_desc: "Notify when a conflicting antivirus is detected",
+                defender_alert_title: "Windows Defender Alert",
+                defender_alert_desc: "Notify when Windows Defender may cause a conflict",
+                defender_exclusion_title: "Windows Defender Exclusion",
+                status_unknown: "Not Detected",
+                status_excluded: "Excluded",
+                status_not_excluded: "Not Excluded",
+                defender_exclusion_desc: "Add the install path to Windows Defender's exclusion list to prevent false-positive blocks. Requires admin rights.",
+                defender_exclusion_btn: "Add Exclusion"
+            },
+            zh: {
+                settings_title: "設定",
+                system: "系統",
+                roblox: "Roblox",
+                windows: "視窗",
+                default_tab_title: "預設分頁",
+                default_tab_desc: "設定程式啟動時預設顯示的分頁",
+                tab_home: "首頁",
+                tab_executor: "執行器",
+                tab_scripthub: "腳本庫",
+                tab_settings: "設定",
+                editor: "編輯器",
+                explorer: "檔案總管",
+                hotkeys: "快捷鍵",
+
+                execute_hotkey_title: "執行腳本快捷鍵",
+                execute_hotkey_desc: "按下快捷鍵即可在任何地方觸發執行",
+                kill_roblox_hotkey_title: "關閉 Roblox 快捷鍵",
+                kill_roblox_hotkey_desc: "按下快捷鍵即可立即關閉 Roblox",
+                boss_key_title: "老闆鍵",
+                boss_key_desc: "立即隱藏或還原 Electra 視窗（工作列圖示保留，無動畫）",
+                quick_attach_hotkey_title: "快速附加快捷鍵",
+                quick_attach_hotkey_desc: "按下快捷鍵即可立即附加至 Roblox",
+
+                auto_update_title: "自動更新",
+                auto_update_desc: "啟動時自動同步 Electra 最新版本",
+                auto_launch_title: "開機自動啟動",
+                auto_launch_desc: "系統開機後自動執行 Electra.exe",
+                auto_launch_roblox_title: "自動啟動 Roblox",
+                auto_launch_roblox_desc: "當 Electra 啟動時自動開啟 Roblox",
+                auto_attach_title: "自動附加",
+                auto_attach_desc: "Roblox 啟動時自動注入遊戲",
+                fps_unlocker_title: "FPS 解鎖",
+                fps_unlocker_desc: "將 Roblox 的 FPS 上限解除至 240fps",
+                crash_detection_title: "Roblox Crash 偵測",
+                crash_detection_desc: "偵測 Roblox 是否閃退，並通知 Electra",
+                language_title: "語言",
+                language_desc: "選擇你的主要使用語言",
+
+                always_on_top_title: "永遠置頂",
+                always_on_top_desc: "將 Electra 視窗設定為最上層",
+                appearance_title: "外觀",
+                appearance_desc: "在深色、淺色或跟隨裝置系統主題間切換",
+                theme_dark: "深色",
+                theme_light: "淺色",
+                theme_device: "跟隨裝置",
+                auto_save_pos_title: "自動儲存視窗位置",
+                auto_save_pos_desc: "開啟時自動儲存並載入視窗位置",
+                save_win_size_title: "儲存視窗大小",
+                save_win_size_desc: "儲存視窗大小以加快下次載入速度",
+                reset_btn: "重置",
+                update_size_btn: "更新大小",
+                anti_screen_title: "反螢幕錄影",
+                anti_screen_desc: "避免被所有螢幕錄影／錄影軟體偵測到",
+                discord_rpc_title: "Discord RPC",
+                discord_rpc_desc: "在 Discord 桌面顯示你的狀態",
+                acrylic_blur_title: "亞克力模糊",
+                acrylic_blur_desc: "為視窗背景套用 Windows 亞克力模糊效果",
+                window_opacity_title: "視窗透明度",
+                window_opacity_desc: "調整視窗的透明度",
+
+                auto_save_script_title: "自動儲存腳本",
+                auto_save_script_desc: "自動儲存編輯器腳本，下次自動載入",
+                mini_map_title: "小地圖",
+                mini_map_desc: "在編輯器右側顯示小地圖",
+                left_mini_map_title: "左側小地圖",
+                left_mini_map_desc: "將小地圖顯示在編輯器左側，而非右側",
+                word_wrap_title: "自動換行",
+                word_wrap_desc: "自動換行過長的程式碼，使其保持在編輯器寬度內",
+                line_number_title: "行號",
+                line_number_desc: "決定是否在 Monaco 左側顯示行號",
+                font_title: "字體",
+                font_desc: "選擇 Monaco 編輯器使用的字體",
+                font_size_title: "字型大小",
+                font_size_desc: "輸入數字以調整 Monaco 文字大小",
+                meteor_effect_title: "流星效果",
+                meteor_effect_desc: "啟用流星背景效果，在編輯器中加入動態流星動畫",
+
+                show_explorer_title: "顯示檔案總管",
+                show_explorer_desc: "顯示檔案總管面板",
+                auto_refresh_explorer_title: "自動重新整理檔案總管",
+                auto_refresh_explorer_desc: "當檔案變更時，自動重新整理檔案總管面板",
+                auto_refresh_interval_title: "自動重新整理頻率",
+                auto_refresh_interval_desc: "設定檔案總管自動重新整理的間隔秒數",
+                explorer_position_title: "檔案總管位置",
+                explorer_position_desc: "選擇檔案總管顯示在編輯器的哪一側",
+                position_left: "左側",
+                position_right: "右側",
+
+                security: "安全性",
+                av_alert_title: "偵測防毒提示",
+                av_alert_desc: "當系統偵測到可能造成衝突的防毒軟體時，顯示提醒通知",
+                defender_alert_title: "Windows Defender 提示",
+                defender_alert_desc: "當系統偵測到 Windows Defender 可能造成衝突時，顯示提醒通知",
+                defender_exclusion_title: "加入 Windows Defender 排除清單",
+                status_unknown: "尚未偵測",
+                status_excluded: "已加入排除清單",
+                status_not_excluded: "尚未排除",
+                defender_exclusion_desc: "將本程式的安裝路徑加入 Windows Defender 排除清單，避免因誤判而遭到攔截或刪除。此操作需要系統管理員權限。",
+                defender_exclusion_btn: "一鍵加入排除清單"
+            }
+        };
+
+        function applyTranslation(lang) {
+            document.body.setAttribute("data-lang", lang);
+            const t = translations[lang] || translations.en;
+            document.querySelectorAll("[data-i18n]").forEach(el => {
+                const key = el.getAttribute("data-i18n");
+                if (t[key]) el.textContent = t[key];
+            });
+
+            document.querySelectorAll(".dropdown").forEach(dropdown => {
+                const selected = dropdown.querySelector(".dropdown-option.selected span");
+                const label = dropdown.querySelector(".dropdown-label");
+                if (selected && label) label.textContent = selected.textContent;
+            });
+        }
+
+        let _currentLang = "en";
+        window.LanguageAPI = {
+            set(lang) {
+                _currentLang = lang;
+                applyTranslation(lang);
+            },
+            get() {
+                return _currentLang;
+            }
+        };
+
+        window.AppAnimation = {
+            play(mode = 'full') {
+                if (mode === 'exit') return this._playExit();
+                if (mode !== 'full') return;
+                const sidebar = document.querySelector('.sidebar');
+                const main = document.querySelector('.pages-track');
+                const targets = [sidebar, main].filter(Boolean);
+
+                targets.forEach(el => {
+                    el.style.transition = "none";
+                    el.style.opacity = "0";
+                    el.style.transform = "translateY(-16px)";
+                });
+
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        targets.forEach(el => {
+                            el.style.transition = "opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1)";
+                            el.style.opacity = "1";
+                            el.style.transform = "translateY(0)";
+                            setTimeout(() => { el.style.transition = ""; }, 450);
+                        });
+                    });
+                });
+            },
+
+            _playExit(onDone) {
+                const sidebar = document.querySelector('.sidebar');
+                const main = document.querySelector('.pages-track');
+                const targets = [sidebar, main].filter(Boolean);
+
+                targets.forEach(el => {
+                    el.style.transition = "opacity 0.22s ease, transform 0.22s cubic-bezier(0.4,0,1,1)";
+                    el.style.opacity = "0";
+                    el.style.transform = "translateY(16px)";
+                });
+
+                setTimeout(() => {
+                    try {
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(JSON.stringify({ action: 'exitAnimationDone' }));
+                        }
+                    } catch (e) { }
+                    if (typeof onDone === 'function') onDone();
+                }, 240);
+            }
+        };
+
+        window.startEntranceAnimation = function () {
+            window.AppAnimation.play('full');
+        };
+
+        window.playExitAnimation = function (onDone) {
+            window.AppAnimation._playExit(onDone);
+        };
+
+        window.AnimationAPI = {
+            playGlobalIntro() {
+                window.AppAnimation.play('full');
+            },
+            playGlobalOutro(onDone) {
+                window.AppAnimation._playExit(onDone);
+            }
+        };
+
+        applyTranslation(LanguageAPI.get());
+        setDropdownValue('Theme', ThemeAPI.getTheme());
+        lucide.createIcons();
+    </script>
+
+    <div id="notification-container"></div>
+    <script>
+        (function () {
+            const MAX_VISIBLE_NOTIFICATIONS = 3;
+            const DEPTH_Y = [0, -16, -28, -38, -46];
+            const DEPTH_SCALE = [1, 0.94, 0.88, 0.84, 0.80];
+            let currentLoadingToast = null;
+
+            function applyNotifStyles(el, y, scale, opacity) {
+                const o = Math.max(0, Math.min(1, opacity));
+                el.style.transform = `translate(-50%, ${y.toFixed(2)}px) scale(${scale})`;
+                el.style.opacity = o;
+            }
+
+            function moveNotification(el, { y, scale, opacity }, { instant = false } = {}) {
+                if (instant) {
+                    el.style.transition = 'none';
+                    applyNotifStyles(el, y, scale, opacity);
+                    void el.offsetHeight;
+                    el.style.transition = '';
+                    return;
+                }
+                applyNotifStyles(el, y, scale, opacity);
+            }
+
+            function primeNotificationEntrance(el) {
+                moveNotification(el, { y: 40, scale: 1, opacity: 0 }, { instant: true });
+            }
+
+            function restackNotifications() {
+                const container = document.getElementById('notification-container');
+                const items = [...container.querySelectorAll('.notification')].filter(el => !el.dataset.removing);
+                container.classList.toggle('has-items', items.length > 0);
+                const ordered = items.slice().reverse();
+                const isExpanded = container.classList.contains('expanded');
+                ordered.forEach((item, depth) => {
+                    if (depth < MAX_VISIBLE_NOTIFICATIONS) {
+                        item.dataset.depth = depth;
+                        item.classList.add('show');
+                        if (!isExpanded) moveNotification(item, { y: DEPTH_Y[depth], scale: DEPTH_SCALE[depth], opacity: 1 });
+                    } else {
+                        dismissNotification(item);
+                    }
+                });
+                if (isExpanded) applyExpandedLayout();
+            }
+
+            function applyExpandedLayout() {
+                const container = document.getElementById('notification-container');
+                const items = [...container.querySelectorAll('.notification.show')]
+                    .filter(el => !el.dataset.removing)
+                    .sort((a, b) => parseInt(a.dataset.depth) - parseInt(b.dataset.depth));
+                const ITEM_SPACING = 10;
+                let offset = 0;
+                items.forEach(item => {
+                    moveNotification(item, { y: -offset, scale: 1, opacity: 1 });
+                    offset += item.offsetHeight + ITEM_SPACING;
+                });
+            }
+
+            function clearExpandedLayout() {
+                const container = document.getElementById('notification-container');
+                const items = [...container.querySelectorAll('.notification.show')].filter(el => !el.dataset.removing);
+                items.forEach(item => {
+                    const depth = parseInt(item.dataset.depth || '0', 10);
+                    moveNotification(item, { y: DEPTH_Y[depth] ?? 0, scale: DEPTH_SCALE[depth] ?? 1, opacity: 1 });
+                });
+            }
+
+            function dismissNotification(item) {
+                if (!item || item.dataset.removing) return;
+                item.dataset.removing = '1';
+                item.classList.remove('show');
+                item.classList.add('hide');
+                item.style.opacity = 0;
+                restackNotifications();
+                setTimeout(() => { item.remove(); }, 460);
+            }
+
+            function showNotification(message, isError = false) {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                if (currentLoadingToast) {
+                    dismissNotification(currentLoadingToast);
+                    currentLoadingToast = null;
+                }
+
+                const toast = document.createElement('div');
+                toast.className = 'notification';
+
+                let icon;
+                if (isError === 'loading') {
+                    icon = `<svg class="spinner" viewBox="0 0 24 24" width="16" height="16" style="transform-origin:50% 50%;">
+                        <circle cx="12" cy="12" r="9" stroke="var(--notif-track)" stroke-width="2.5" fill="none"/>
+                        <circle cx="12" cy="12" r="9" stroke="var(--notif-text)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="50" stroke-dashoffset="35"/>
+                    </svg>`;
+                } else if (isError) {
+                    icon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d32f2f" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>`;
+                } else {
+                    icon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--notif-text)" stroke-width="2.5">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>`;
+                }
+
+                const textBlock = `<div style="display:flex;flex-direction:column;gap:2px;">
+                    <span style="color: var(--notif-text); font-size:14px; font-weight:500;">${message}</span>
+                </div>`;
+
+                toast.innerHTML = `<div style="display:flex;align-items:center;gap:12px;"><div style="display:flex;flex-shrink:0;">${icon}</div>${textBlock}</div>`;
+
+                container.appendChild(toast);
+                primeNotificationEntrance(toast);
+
+                void toast.offsetHeight;
+                requestAnimationFrame(() => requestAnimationFrame(() => restackNotifications()));
+
+                if (isError === 'loading') {
+                    currentLoadingToast = toast;
+                    return;
+                }
+                setTimeout(() => dismissNotification(toast), 3500);
+            }
+
+            const container = document.getElementById('notification-container');
+            if (container) {
+                container.addEventListener('mouseenter', () => {
+                    if (!container.classList.contains('has-items')) return;
+                    container.classList.add('expanded');
+                    applyExpandedLayout();
+                });
+                container.addEventListener('mouseleave', () => {
+                    container.classList.remove('expanded');
+                    clearExpandedLayout();
+                });
+            }
+
+            let activeProgressObj = null;
+
+            function showProgressNotification(message, durationSeconds) {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                if (activeProgressObj) {
+                    completeProgressNotification('100%');
+                }
+
+                const toast = document.createElement('div');
+                toast.className = 'notification has-progress';
+
+                const icon = `<svg class="spinner" viewBox="0 0 24 24" width="16" height="16" style="transform-origin:50% 50%;">
+                    <circle cx="12" cy="12" r="9" stroke="var(--notif-track)" stroke-width="2.5" fill="none"/>
+                    <circle cx="12" cy="12" r="9" stroke="var(--notif-text)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="50" stroke-dashoffset="35"/>
+                </svg>`;
+
+                toast.innerHTML = `<div class="notif-top-row"><div style="display:flex;">${icon}</div><span style="color:var(--notif-text);">${message}</span></div>`;
+
+                const barContainer = document.createElement('div');
+                barContainer.className = 'notification-progress-container';
+                const progressTrack = document.createElement('div');
+                progressTrack.className = 'notification-progress-track';
+                const progressFill = document.createElement('div');
+                progressFill.className = 'notification-progress-fill';
+                progressTrack.appendChild(progressFill);
+                const progressLabel = document.createElement('div');
+                progressLabel.className = 'notification-progress-label';
+                progressLabel.textContent = '0%';
+                barContainer.appendChild(progressTrack);
+                barContainer.appendChild(progressLabel);
+                toast.appendChild(barContainer);
+
+                container.appendChild(toast);
+                primeNotificationEntrance(toast);
+
+                void toast.offsetHeight;
+                requestAnimationFrame(() => requestAnimationFrame(() => restackNotifications()));
+
+                activeProgressObj = { toast, fill: progressFill, label: progressLabel };
+            }
+
+            function updateProgressNotification(percent) {
+                if (!activeProgressObj) return;
+                const p = Math.max(0, Math.min(99, percent));
+                activeProgressObj.fill.style.width = p + '%';
+                activeProgressObj.label.textContent = Math.floor(p) + '%';
+            }
+
+            function completeProgressNotification(finishMessage) {
+                if (!activeProgressObj) return;
+                const { toast, fill, label } = activeProgressObj;
+                const span = toast.querySelector('.notif-top-row span');
+                if (span && finishMessage) span.textContent = finishMessage;
+
+                fill.style.transition = 'width 2s cubic-bezier(0.16, 1, 0.3, 1)';
+                fill.style.width = '100%';
+                if (label) label.textContent = '100%';
+
+                setTimeout(() => dismissNotification(toast), 2000);
+                activeProgressObj = null;
+            }
+
+            window.showNotification = showNotification;
+            window.showProgressNotification = showProgressNotification;
+            window.updateProgressNotification = updateProgressNotification;
+            window.completeProgressNotification = completeProgressNotification;
+        })();
+    </script>
+</body>
+
+</html>

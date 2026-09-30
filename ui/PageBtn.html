@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page</title>
+
+    <script>
+        (function () {
+            document.documentElement.classList.add('pre-render');
+            document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+
+        (function () {
+            function checkDividerValidity() {
+                const raw = document.documentElement.getAttribute('data-theme');
+                const valid = (raw === 'light' || raw === 'dark');
+                document.documentElement.classList.toggle('no-divider', !valid);
+            }
+
+            try {
+                new MutationObserver(checkDividerValidity)
+                    .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+            } catch (e) { }
+
+            window.addEventListener('DOMContentLoaded', checkDividerValidity);
+            checkDividerValidity();
+
+            function applyTheme(theme) {
+                theme = (theme === 'light') ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+
+                try {
+                    window.dispatchEvent(new CustomEvent('themechange', {
+                        detail: { theme: theme }
+                    }));
+                } catch (e) { }
+
+                if (window.chrome && window.chrome.webview) {
+                    try {
+                        window.chrome.webview.postMessage({
+                            action: 'themeChanged',
+                            theme: theme
+                        });
+                    } catch (e) { }
+                }
+            }
+
+            window.ThemeAPI = {
+                setDark: function () {
+                    applyTheme('dark');
+                },
+                setLight: function () {
+                    applyTheme('light');
+                },
+                toggle: function () {
+                    const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                    applyTheme(cur === 'light' ? 'dark' : 'light');
+                },
+                getTheme: function () {
+                    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                }
+            };
+        })();
+    </script>
+
+    <style>
+        :root {
+            --bg: transparent;
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --text-active: rgba(255, 255, 255, 0.9);
+            --item-hover: rgba(255, 255, 255, 0.06);
+            --item-active: rgba(255, 255, 255, 0.1);
+            --divider: rgba(29, 29, 29, 1.0);
+            --indicator-color: rgb(250, 250, 250);
+            --transition: all 0.2s ease-out;
+        }
+
+        [data-theme="light"] {
+            --bg: transparent;
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --text-active: rgba(0, 0, 0, 0.9);
+            --item-hover: rgba(0, 0, 0, 0.06);
+            --item-active: rgba(0, 0, 0, 0.1);
+            --divider: rgba(225, 225, 225, 1.0);
+            --indicator-color: rgb(5, 5, 5);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+        }
+
+        body {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            position: relative;
+            forced-color-adjust: none;
+        }
+
+        .divider-top,
+        .divider-right {
+            position: absolute;
+            background: var(--divider);
+            pointer-events: none;
+            z-index: 999999;
+        }
+
+        .divider-top {
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 0.5px;
+        }
+
+        .divider-right {
+            top: 0;
+            right: 1px;
+            bottom: 0;
+            width: 1px;
+        }
+
+        html.no-divider .divider-top,
+        html.no-divider .divider-right {
+            display: none;
+        }
+
+        .nav-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            height: 100%;
+            padding: 10px 0;
+            gap: 8px;
+        }
+
+        .nav-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 37px;
+            height: 36px;
+            border-radius: 6px;
+            cursor: pointer;
+            background: transparent;
+            transition: var(--transition);
+            user-select: none;
+            flex-shrink: 0;
+            text-decoration: none;
+        }
+
+            .nav-item svg {
+                width: 20px;
+                height: 20px;
+                stroke: var(--text-muted);
+                stroke-width: 2px;
+                transition: var(--transition);
+            }
+
+            .nav-item:hover svg {
+                stroke: var(--text-active);
+            }
+
+            .nav-item.active svg {
+                stroke: var(--text-active);
+            }
+
+            .nav-item svg[fill="currentColor"] {
+                color: var(--text-muted);
+                stroke: none !important;
+            }
+
+            .nav-item:hover svg[fill="currentColor"] {
+                color: var(--text-active);
+            }
+
+        .active-indicator {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 0;
+            background: var(--indicator-color);
+            border-radius: 0 2px 2px 0;
+            transition: opacity 0.2s ease-out, height 0.25s ease-out;
+            transform: translateY(-50%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1000000;
+        }
+
+            .active-indicator.visible {
+                height: 22px;
+                opacity: 1;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="divider-top"></div>
+    <div class="divider-right"></div>
+    <div class="nav-container">
+        <div class="nav-group nav-group-top">
+            <div class="nav-item" data-tab="Dashboard">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+            </div>
+            <div class="nav-item active" data-tab="Executor">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                </svg>
+            </div>
+            <div class="nav-item" data-tab="ScriptHub">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z" />
+                </svg>
+            </div>
+        </div>
+        <div class="nav-group nav-group-bottom">
+            <div class="nav-item" data-tab="Settings">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l-.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+            </div>
+            <a class="nav-item" href="https://discord.gg/9nFw8skNrA" target="_blank" rel="noopener noreferrer" title="Discord">
+                <svg viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                    <path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.07.07 0 0 0-.076.038c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.6 12.6 0 0 0-.617-1.25.077.077 0 0 0-.076-.038 19.74 19.74 0 0 0-4.885 1.515.07.07 0 0 0-.032.028C.533 9.09-.32 13.68.099 18.21a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.927 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.128 12.3 12.3 0 0 1-1.873.891.076.076 0 0 0-.04.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.055c.5-5.177-.838-9.735-3.548-13.813a.06.06 0 0 0-.031-.029zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.955 2.419-2.157 2.419zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.418 2.157-2.418 1.21 0 2.176 1.094 2.157 2.418 0 1.334-.946 2.419-2.157 2.419z" />
+                </svg>
+            </a>
+            <a class="nav-item" href="https://discord.gg/9nFw8skNrA" target="_blank" rel="noopener noreferrer" title="Discord">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+    <script>
+        let currentIndicatorEl = null;
+
+        function createIndicatorEl(top) {
+            const el = document.createElement('div');
+            el.className = 'active-indicator';
+            el.style.top = top + 'px';
+            document.body.appendChild(el);
+            return el;
+        }
+
+        function showIndicatorAt(target) {
+            if (!target) return null;
+            const rect = target.getBoundingClientRect();
+            const top = rect.top + rect.height / 2;
+            const el = createIndicatorEl(top);
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => el.classList.add('visible'));
+            });
+            return el;
+        }
+
+        function hideAndRemove(el) {
+            if (!el) return;
+            el.classList.remove('visible');
+            setTimeout(() => el.remove(), 260);
+        }
+
+        function moveIndicatorTo(target) {
+            currentIndicatorEl = showIndicatorAt(target);
+        }
+
+        function switchIndicatorTo(target) {
+            if (!target) return;
+            hideAndRemove(currentIndicatorEl);
+            currentIndicatorEl = showIndicatorAt(target);
+        }
+
+        function activateTab(tabName, notify) {
+            const target = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
+            if (!target || target.classList.contains('active')) return false;
+            document.querySelector('.nav-item.active')?.classList.remove('active');
+            target.classList.add('active');
+            if (notify && window.chrome?.webview) window.chrome.webview.postMessage(tabName);
+
+            switchIndicatorTo(target);
+
+            return true;
+        }
+
+        document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
+            item.addEventListener('click', () => {
+                activateTab(item.dataset.tab, true);
+            });
+        });
+
+        window.NavAPI = {
+            setActive: function (tabName) {
+                return activateTab(tabName, false);
+            },
+            getActive: function () {
+                return document.querySelector('.nav-item.active')?.dataset.tab || null;
+            }
+        };
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                document.documentElement.classList.remove('pre-render');
+                moveIndicatorTo(document.querySelector('.nav-item.active'));
+            });
+        });
+
+        window.addEventListener('resize', () => {
+            const active = document.querySelector('.nav-item.active');
+            if (active && currentIndicatorEl) {
+                const rect = active.getBoundingClientRect();
+                currentIndicatorEl.style.top = (rect.top + rect.height / 2) + 'px';
+            }
+        });
+    </script>
+</body>
+
+</html>

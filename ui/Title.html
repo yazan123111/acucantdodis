@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electra</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        (function () {
+            document.documentElement.classList.add('pre-render');
+            document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+
+        (function () {
+            function applyTheme(theme) {
+                theme = (theme === 'light') ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+
+                try {
+                    window.dispatchEvent(new CustomEvent('themechange', {
+                        detail: { theme: theme }
+                    }));
+                } catch (e) { }
+
+                if (window.chrome && window.chrome.webview) {
+                    try {
+                        window.chrome.webview.postMessage({
+                            action: 'themeChanged',
+                            theme: theme
+                        });
+                    } catch (e) { }
+                }
+            }
+
+            window.ThemeAPI = {
+                setDark: function () {
+                    applyTheme('dark');
+                },
+                setLight: function () {
+                    applyTheme('light');
+                },
+                toggle: function () {
+                    const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                    applyTheme(cur === 'light' ? 'dark' : 'light');
+                },
+                getTheme: function () {
+                    return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                }
+            };
+        })();
+    </script>
+
+    <style>
+        :root {
+            --bg: transparent;
+            --text-active: rgba(255, 255, 255, 1);
+            --best-color: #A8DDFA;
+        }
+
+        [data-theme="light"] {
+            --bg: transparent;
+            --text-active: rgba(0, 0, 0, 0.9);
+            --best-color: #7EC8F5;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            opacity: 0;
+            transition: opacity 0.35s ease-out;
+        }
+
+        html:not(.pre-render) body {
+            opacity: 1;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title {
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.3px;
+            color: var(--text-active);
+            user-select: none;
+        }
+
+        .title .best {
+            color: var(--best-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="title">Electra</div>
+
+    <script>
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                document.documentElement.classList.remove('pre-render');
+            });
+        });
+    </script>
+</body>
+
+</html>

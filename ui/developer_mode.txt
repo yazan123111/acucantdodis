@@ -1,0 +1,7 @@
+# Crescent UI Developer Mode
+# To disable developer mode (DevTools, Inspect Element, F5 Reload), delete this file or rename it.
+# When this file exists in the ui/ directory or the app root:
+# 1. F12 opens the Edge Developer Tools Inspector.
+# 2. Right-click context menu enables "Inspect Element".
+# 3. F5 reloads the current HTML/CSS view live without restarting Crescent!
+ENABLED=true

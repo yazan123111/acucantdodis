@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crescent UI Workbench & Live Previewer</title>
+  <link rel="stylesheet" href="custom.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: var(--crescent-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+      background: #09090b;
+      color: #f4f4f5;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    /* Top Toolbar */
+    header {
+      background: #121215;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+    .brand span {
+      color: var(--crescent-accent, #3b82f6);
+    }
+    .tab-selector {
+      display: flex;
+      gap: 6px;
+      background: #18181b;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #a1a1aa;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover {
+      color: #ffffff;
+      background: rgba(255,255,255,0.05);
+    }
+    .tab-btn.active {
+      background: var(--crescent-accent, #3b82f6);
+      color: #ffffff;
+      box-shadow: 0 2px 10px var(--crescent-accent-glow, rgba(59,130,246,0.3));
+    }
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn {
+      background: #27272a;
+      color: #f4f4f5;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover {
+      background: #3f3f46;
+      border-color: rgba(255,255,255,0.2);
+    }
+    .btn-accent {
+      background: var(--crescent-accent, #3b82f6);
+      border-color: transparent;
+      color: #fff;
+    }
+    .btn-accent:hover {
+      filter: brightness(1.1);
+    }
+    /* Main Layout */
+    .workbench {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    /* Preview Container */
+    .preview-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: radial-gradient(circle at center, #18181b 0%, #09090b 100%);
+      overflow: auto;
+    }
+    /* Simulated Crescent Window */
+    .window-frame {
+      width: 1015px;
+      height: 568px;
+      background: var(--crescent-bg-main, #0c0c0c);
+      border-radius: 12px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .window-header {
+      height: 38px;
+      background: #111114;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      user-select: none;
+    }
+    .window-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #d4d4d8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .window-title-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--crescent-accent, #3b82f6);
+      box-shadow: 0 0 8px var(--crescent-accent, #3b82f6);
+    }
+    .window-controls {
+      display: flex;
+      gap: 8px;
+    }
+    .wc-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: none;
+    }
+    .wc-close { background: #ef4444; }
+    .wc-min { background: #f59e0b; }
+    .wc-max { background: #10b981; }
+    .window-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    .window-sidebar {
+      width: 60px;
+      background: #0d0d0f;
+      border-right: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 15px;
+      gap: 16px;
+    }
+    .sidebar-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #71717a;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .sidebar-icon:hover {
+      color: #f4f4f5;
+      background: rgba(255,255,255,0.05);
+    }
+    .sidebar-icon.active {
+      color: var(--crescent-accent, #3b82f6);
+      background: rgba(59, 130, 246, 0.1);
+    }
+    .window-viewport {
+      flex: 1;
+      background: var(--crescent-bg-main, #0c0c0c);
+      position: relative;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    /* Side Panel / Customizer */
+    .customizer-panel {
+      width: 320px;
+      background: #111114;
+      border-left: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .customizer-header {
+      padding: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .customizer-content {
+      padding: 16px;
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .control-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #a1a1aa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .color-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #18181b;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .color-row span {
+      font-size: 13px;
+      color: #e4e4e7;
+    }
+    input[type="color"] {
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      background: none;
+    }
+    .presets-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .preset-chip {
+      background: #18181b;
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #d4d4d8;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .preset-chip:hover {
+      background: #27272a;
+      border-color: rgba(255,255,255,0.15);
+    }
+    .preset-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    /* Instructions card */
+    .guide-card {
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #93c5fd;
+    }
+    .guide-card b {
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      Crescent <span>UI Workbench</span>
+    </div>
+
+    <div class="tab-selector">
+      <button class="tab-btn" onclick="switchView('Animation.html', this)">Splash Intro</button>
+      <button class="tab-btn active" onclick="switchView('Monaco.html', this)">Monaco Editor</button>
+      <button class="tab-btn" onclick="switchView('Home.html', this)">Dashboard</button>
+      <button class="tab-btn" onclick="switchView('ScriptHub.html', this)">Script Hub</button>
+      <button class="tab-btn" onclick="switchView('Settings.html', this)">Settings</button>
+      <button class="tab-btn" onclick="switchView('Title.html', this)">Title Bar</button>
+      <button class="tab-btn" onclick="switchView('PageBtn.html', this)">Sidebar</button>
+    </div>
+
+    <div class="toolbar-actions">
+      <button class="btn" onclick="reloadFrame()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+        Reload View
+      </button>
+      <button class="btn btn-accent" onclick="copyCustomCss()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        Copy custom.css
+      </button>
+    </div>
+  </header>
+
+  <div class="workbench">
+    <!-- Viewport Area -->
+    <main class="preview-area">
+      <div class="window-frame" id="windowFrame">
+        <div class="window-header">
+          <div class="window-title">
+            <div class="window-title-dot"></div>
+            Crescent v3 — Visual Preview
+          </div>
+          <div class="window-controls">
+            <div class="wc-btn wc-min"></div>
+            <div class="wc-btn wc-max"></div>
+            <div class="wc-btn wc-close"></div>
+          </div>
+        </div>
+        <div class="window-body">
+          <div class="window-sidebar" id="simSidebar">
+            <div class="sidebar-icon" title="Dashboard" onclick="switchView('Home.html')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+            </div>
+            <div class="sidebar-icon active" title="Editor" onclick="switchView('Monaco.html')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            </div>
+            <div class="sidebar-icon" title="Script Hub" onclick="switchView('ScriptHub.html')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+            </div>
+            <div class="sidebar-icon" title="Settings" onclick="switchView('Settings.html')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            </div>
+          </div>
+          <div class="window-viewport">
+            <iframe id="previewFrame" src="Monaco.html"></iframe>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Customizer Drawer -->
+    <aside class="customizer-panel">
+      <div class="customizer-header">
+        Theme Customizer
+        <span style="font-size: 11px; color: #71717a;">Live Inject</span>
+      </div>
+      <div class="customizer-content">
+
+        <div class="guide-card">
+          💡 <b>Live UI Customizer</b><br>
+          Pick colors or choose a preset below. When satisfied, click <b>"Copy custom.css"</b> and paste it into <code style="color:#60a5fa">ui/custom.css</code>!
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">Quick Presets</div>
+          <div class="presets-grid">
+            <div class="preset-chip" onclick="applyPreset('#3b82f6', '#0c0c0c')">
+              <div class="preset-dot" style="background:#3b82f6;"></div> Electric Blue
+            </div>
+            <div class="preset-chip" onclick="applyPreset('#a855f7', '#090514')">
+              <div class="preset-dot" style="background:#a855f7;"></div> Cyber Purple
+            </div>
+            <div class="preset-chip" onclick="applyPreset('#10b981', '#06130b')">
+              <div class="preset-dot" style="background:#10b981;"></div> Matrix Green
+            </div>
+            <div class="preset-chip" onclick="applyPreset('#ef4444', '#140505')">
+              <div class="preset-dot" style="background:#ef4444;"></div> Blood Red
+            </div>
+            <div class="preset-chip" onclick="applyPreset('#f59e0b', '#120d04')">
+              <div class="preset-dot" style="background:#f59e0b;"></div> Sunset Amber
+            </div>
+            <div class="preset-chip" onclick="applyPreset('#06b6d4', '#041215')">
+              <div class="preset-dot" style="background:#06b6d4;"></div> Cyan Neon
+            </div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">Colors</div>
+          <div class="color-row">
+            <span>Accent Primary</span>
+            <input type="color" id="accentColor" value="#3b82f6" oninput="updateTheme()">
+          </div>
+          <div class="color-row">
+            <span>Main Background</span>
+            <input type="color" id="bgColor" value="#0c0c0c" oninput="updateTheme()">
+          </div>
+          <div class="color-row">
+            <span>Card Surface</span>
+            <input type="color" id="surfaceColor" value="#141414" oninput="updateTheme()">
+          </div>
+          <div class="color-row">
+            <span>Text Primary</span>
+            <input type="color" id="textColor" value="#f3f4f6" oninput="updateTheme()">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="control-label">Developer Tips</div>
+          <p style="font-size:12px; color:#a1a1aa; line-height: 1.5;">
+            • To edit any page, open the HTML file in <code style="color:#60a5fa">ui/</code> with VS Code or Notepad.<br>
+            • In Crescent, press <kbd style="background:#27272a; padding:2px 5px; border-radius:4px;">F12</kbd> to inspect elements live.<br>
+            • Press <kbd style="background:#27272a; padding:2px 5px; border-radius:4px;">F5</kbd> to reload changes instantly.
+          </p>
+        </div>
+
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const frame = document.getElementById('previewFrame');
+
+    function switchView(url, btn) {
+      frame.src = url;
+      if (btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      // Hide simulated sidebar if viewing splash intro
+      document.getElementById('simSidebar').style.display = (url === 'Animation.html') ? 'none' : 'flex';
+    }
+
+    function reloadFrame() {
+      frame.contentWindow.location.reload();
+    }
+
+    function applyPreset(accent, bg) {
+      document.getElementById('accentColor').value = accent;
+      document.getElementById('bgColor').value = bg;
+      updateTheme();
+    }
+
+    function updateTheme() {
+      const accent = document.getElementById('accentColor').value;
+      const bg = document.getElementById('bgColor').value;
+      const surface = document.getElementById('surfaceColor').value;
+      const text = document.getElementById('textColor').value;
+
+      document.documentElement.style.setProperty('--crescent-accent', accent);
+      document.documentElement.style.setProperty('--crescent-bg-main', bg);
+      document.documentElement.style.setProperty('--crescent-bg-surface', surface);
+      document.documentElement.style.setProperty('--crescent-text-primary', text);
+
+      // Inject into iframe
+      try {
+        const iDoc = frame.contentDocument || frame.contentWindow.document;
+        if (iDoc) {
+          let styleEl = iDoc.getElementById('custom-workbench-style');
+          if (!styleEl) {
+            styleEl = iDoc.createElement('style');
+            styleEl.id = 'custom-workbench-style';
+            iDoc.head.appendChild(styleEl);
+          }
+          styleEl.textContent = `
+            :root {
+              --crescent-accent: ${accent} !important;
+              --crescent-bg-main: ${bg} !important;
+              --crescent-bg-surface: ${surface} !important;
+              --crescent-text-primary: ${text} !important;
+            }
+          `;
+        }
+      } catch (e) {
+        console.warn('Cross-frame injection warning:', e);
+      }
+    }
+
+    function copyCustomCss() {
+      const accent = document.getElementById('accentColor').value;
+      const bg = document.getElementById('bgColor').value;
+      const surface = document.getElementById('surfaceColor').value;
+      const text = document.getElementById('textColor').value;
+
+      const css = `:root {
+  --crescent-accent: ${accent};
+  --crescent-accent-hover: ${accent};
+  --crescent-accent-glow: ${accent}66;
+  --crescent-bg-main: ${bg};
+  --crescent-bg-surface: ${surface};
+  --crescent-text-primary: ${text};
+}
+`;
+      navigator.clipboard.writeText(css).then(() => {
+        alert('CSS Theme copied to clipboard! Paste it into ui/custom.css to apply it permanently to Crescent.');
+      });
+    }
+
+    frame.addEventListener('load', () => {
+      updateTheme();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+
+    <script>
+        (function () {
+            function safeGet(fn, fallback) {
+                try {
+                    return fn();
+                } catch (e) {
+                    return fallback;
+                }
+            }
+
+            function applyTheme(theme) {
+                try {
+                    theme = (theme === 'light') ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', theme);
+
+                    try {
+                        localStorage.setItem('app_theme', theme);
+                    } catch (e) { }
+
+                    try {
+                        window.dispatchEvent(new CustomEvent('themechange', {
+                            detail: { theme: theme }
+                        }));
+                    } catch (e) { }
+
+                    try {
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(JSON.stringify({
+                                action: 'themeChanged',
+                                theme: theme
+                            }));
+                        }
+                    } catch (e) { }
+
+                    return 'ok';
+                } catch (e) {
+                    return 'error';
+                }
+            }
+
+            var saved = safeGet(function () { return localStorage.getItem('app_theme'); }, null);
+            var initTheme = (saved === 'light' || saved === 'dark') ? saved : 'dark';
+            safeGet(function () {
+                document.documentElement.setAttribute('data-theme', initTheme);
+                return true;
+            }, false);
+
+            window.ThemeAPI = {
+                setDark: function () {
+                    return safeGet(function () { return applyTheme('dark'); }, 'error');
+                },
+                setLight: function () {
+                    return safeGet(function () { return applyTheme('light'); }, 'error');
+                },
+                toggle: function () {
+                    return safeGet(function () {
+                        var cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                        return applyTheme(cur === 'light' ? 'dark' : 'light');
+                    }, 'error');
+                },
+                getTheme: function () {
+                    return safeGet(function () {
+                        return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+                    }, 'dark');
+                }
+            };
+
+            window.__themeApiReady = true;
+        })();
+
+        window.addEventListener('error', function (e) {
+            try { e.preventDefault(); } catch (_) { }
+            return true;
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+            try { e.preventDefault(); } catch (_) { }
+        });
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: rgb(12, 12, 12);
+            --panel-bg: #131313;
+            --border: #2c2c2c;
+            --divider: rgba(29, 29, 29, 1.0);
+            --divider-strong: rgba(50, 50, 50, 1.0);
+            --text-main: #f2f2f2;
+            --text-dim: #9a9a9a;
+            --text-faint: rgb(210,210,210);
+            --accent: White;
+            --round: 10px;
+            --sidebar-width: 248px;
+            --tile-bg: rgba(255, 255, 255, 0.06);
+            --signal: #e8e8e8;
+            --signal-dim: rgba(232, 232, 232, 0.10);
+            --hover-subtle: rgba(255, 255, 255, 0.025);
+            --warn: #f5a623;
+            --panel-flat: #101010;
+            --panel-raised: rgba(255, 255, 255, 0.035);
+        }
+
+        [data-theme="light"] {
+            --bg: rgb(243, 243, 243);
+            --panel-bg: #ffffff;
+            --border: #e2e2e2;
+            --divider: rgba(225, 225, 225, 1.0);
+            --divider-strong: rgba(225, 225, 225, 1.0);
+            --text-main: #1c1c1c;
+            --text-dim: #767676;
+            --text-faint: Black;
+            --accent: Black;
+            --tile-bg: rgba(255, 255, 255, 0.55);
+            --signal: #2b2b2b;
+            --signal-dim: rgba(0, 0, 0, 0.05);
+            --hover-subtle: rgba(0, 0, 0, 0.02);
+            --warn: #b9770e;
+            --panel-flat: #ffffff;
+            --panel-raised: rgba(0, 0, 0, 0.02);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: default;
+            user-select: none;
+            font-family: 'Quicksand', 'Inter', sans-serif;
+        }
+
+        html, body {
+            background-color: var(--bg);
+        }
+
+        body {
+            color: var(--text-main);
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            overflow: hidden;
+            border-top: 0.5px solid var(--divider);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            background-color: var(--bg);
+            border-right: 1px solid var(--divider);
+            border-top: 0.5px solid var(--divider);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+            padding: 16px 16px;
+            opacity: 0;
+            transform: translateX(-40px);
+            overflow-y: auto;
+        }
+
+        .brand-zone {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 8px 20px 8px;
+        }
+
+        .brand-mark {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
+            display: block;
+        }
+
+            .brand-mark img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                display: block;
+            }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        button, .sidebar-tab-btn, .sidebar-links a, [onclick] {
+            cursor: pointer;
+        }
+
+        button *, .sidebar-tab-btn *, .sidebar-links a *, [onclick] * {
+            cursor: inherit;
+        }
+
+        .sidebar-tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 8px;
+            border: none;
+            background: none;
+            color: var(--text-dim);
+            font-family: 'Quicksand', 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+            .sidebar-tab-btn svg {
+                width: 17px;
+                height: 17px;
+                flex-shrink: 0;
+            }
+
+            .sidebar-tab-btn img {
+                width: 17px;
+                height: 17px;
+                flex-shrink: 0;
+                object-fit: contain;
+                opacity: 0.7;
+            }
+
+            .sidebar-tab-btn:hover img,
+            .sidebar-tab-btn.active img {
+                opacity: 1;
+            }
+
+            [data-theme="light"] .sidebar-tab-btn img {
+                filter: invert(1);
+            }
+
+            .sidebar-tab-btn:hover {
+                background: var(--tile-bg);
+                color: var(--text-main);
+            }
+
+            .sidebar-tab-btn.active {
+                background: var(--tile-bg);
+                color: var(--text-main);
+            }
+
+        .sidebar-spacer {
+            flex: 1;
+        }
+
+        .sidebar-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 14px;
+        }
+
+            .sidebar-links a {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 9px 12px;
+                border-radius: 8px;
+                font-size: 15px;
+                font-weight: 500;
+                color: var(--text-dim);
+                text-decoration: none;
+                background: transparent;
+                transition: all 0.18s ease;
+            }
+
+                .sidebar-links a svg {
+                    width: 17px;
+                    height: 17px;
+                    flex-shrink: 0;
+                }
+
+                .sidebar-links a:hover {
+                    background: var(--tile-bg);
+                    color: var(--text-main);
+                }
+
+                .sidebar-link-text {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1px;
+                    min-width: 0;
+                }
+
+                .sidebar-link-url {
+                    display: none;
+                }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width) - 1.5px);
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+            padding: 36px 52px;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        .view {
+            display: none;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .view.active {
+            display: flex;
+        }
+
+        .view-title {
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .view-title::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 3px;
+            bottom: 3px;
+            width: 3px;
+            border-radius: 2px;
+            background: var(--signal);
+        }
+
+        .view-sub {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-top: 6px;
+            padding-left: 15px;
+        }
+
+        .stat-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .stat-row + .stat-row {
+            margin-top: 16px;
+        }
+
+        .stat-row-single {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-row-3 {
+            grid-template-columns: 1fr;
+            gap: 0;
+            background: var(--panel-flat);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .stat-row-3 .stat-cell {
+            border: none;
+            border-bottom: 1px solid var(--divider-strong);
+            border-radius: 0;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            gap: 12px;
+        }
+
+        .stat-row-3 .stat-cell .stat-label {
+            flex-shrink: 0;
+            min-width: 50px;
+        }
+
+        .stat-row-3 .stat-cell .stat-val {
+            flex: 1;
+            text-align: right;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        
+
+        .stat-row-3 .stat-cell:last-child {
+            border-bottom: none;
+        }
+
+        .stat-cell {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 16px 18px;
+            background: var(--panel-flat);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: background-color 0.2s ease;
+        }
+
+        .stat-cell:hover {
+            background: var(--tile-bg);
+        }
+
+        .stat-row-3 .stat-val {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dim);
+        }
+
+        .stat-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-row-3 .stat-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+            text-transform: none;
+            letter-spacing: normal;
+        }
+
+        .stat-cell:hover .stat-label::before {
+            background: var(--signal);
+        }
+
+        .stat-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .plan-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 17px 20px 17px 18px;
+            background: var(--panel-flat);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .plan-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .plan-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .plan-desc {
+            font-size: 12.5px;
+            color: var(--text-dim);
+        }
+
+        .plan-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #fff;
+            background: #fff;
+            color: #000;
+        }
+
+        .view-title-row {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .version-row-spaced {
+            margin-top: 14px;
+        }
+
+        .version-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .version-number {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+        }
+
+        .latest-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            padding: 3px 7px;
+            border-radius: 4px;
+            border: 1px solid #fff;
+            background: #fff;
+            color: #000;
+        }
+
+        .section-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--divider-strong);
+            margin-bottom: 2px;
+        }
+
+        .section-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: none;
+            letter-spacing: 0.02em;
+        }
+
+        .section-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-link {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: color 0.15s ease;
+            font-family: 'Quicksand', 'Inter', sans-serif;
+        }
+
+            .section-link:hover {
+                color: var(--signal);
+            }
+
+        .changelog-col .section-head {
+            border-bottom: none;
+        }
+
+        .version-section-head {
+            border-bottom: none;
+        }
+
+        .changelog-columns {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .changelog-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .preview-logs {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .log-entry {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            color: var(--text-dim);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            padding: 6px 16px;
+            margin: 0 -16px;
+            border-bottom: 1px solid var(--divider-strong);
+            opacity: 0;
+            animation: fadeIn 0.2s ease-out forwards;
+            position: relative;
+            padding-left: 32px;
+        }
+
+            .log-entry::before {
+                content: "+";
+                position: absolute;
+                left: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-dim);
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 1;
+            }
+
+            .log-entry:last-child {
+                border-bottom: none;
+            }
+
+        .updatelog-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            background: var(--panel-flat);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .log-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .log-groups-tight {
+            margin-top: -16px;
+        }
+
+        .updatelog-panel .log-groups-tight {
+            margin-top: 0;
+        }
+
+        .log-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            background: var(--panel-raised);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0 16px;
+            opacity: 0;
+            animation: fadeInUp 0.25s ease-out forwards;
+        }
+
+        .log-group-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            padding: 12px 0 10px 0;
+            border-bottom: 1px solid var(--divider-strong);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .log-group-title::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            background: var(--signal);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .log-group-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            padding: 4px 0 0 0;
+        }
+
+        .log-line {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            color: var(--text-dim);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-break: break-word;
+            padding: 6px 16px;
+            margin: 0 -16px;
+            position: relative;
+            padding-left: 32px;
+            border-bottom: 1px solid var(--divider-strong);
+        }
+
+            .log-line::before {
+                content: "+";
+                position: absolute;
+                left: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-dim);
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 1;
+            }
+
+            .log-line:last-child {
+                border-bottom: none;
+            }
+
+        .roblox-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            background: var(--panel-raised);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .roblox-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 14px 18px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid var(--divider-strong);
+            border-radius: 0;
+        }
+
+        .roblox-card:last-child {
+            border-bottom: none;
+        }
+
+        .roblox-card-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .roblox-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+        }
+
+        .roblox-tag.latest {
+            color: #000;
+            border-color: #fff;
+            background: #fff;
+        }
+
+        .roblox-version-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-main);
+            word-break: break-all;
+        }
+
+        .roblox-status-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 18px;
+            background: var(--panel-raised);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-dim);
+        }
+
+        .roblox-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            flex-shrink: 0;
+        }
+
+        .roblox-status-row.ok .roblox-status-dot {
+            background: #4ade80;
+        }
+
+        .roblox-status-row.stale .roblox-status-dot {
+            background: #f59e0b;
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(140, 140, 140, 0.6);
+            border-radius: 100px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(140, 140, 140, 0.9);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                border-right: none;
+                border-bottom: 1px solid var(--divider-strong);
+                flex-direction: row;
+                align-items: center;
+                padding: 14px 16px;
+            }
+
+            .sidebar-spacer,
+            .sidebar-links {
+                display: none;
+            }
+
+            .changelog-columns {
+                grid-template-columns: 1fr;
+            }
+
+            body {
+                flex-direction: column;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 24px 20px;
+            }
+
+            .stat-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        :root {
+            --notif-bg: #ffffff;
+            --notif-text: #111111;
+            --notif-shadow-soft: rgba(0, 0, 0, 0.25);
+            --notif-shadow-strong: rgba(0, 0, 0, 0.3);
+            --notif-inset: rgba(0, 0, 0, 0.02);
+            --notif-track: rgba(0, 0, 0, 0.12);
+        }
+
+        [data-theme="light"] {
+            --notif-bg: rgba(0, 0, 0, 1.0);
+            --notif-text: rgba(238, 238, 238, 1.0);
+            --notif-shadow-soft: rgba(0, 0, 0, 0.25);
+            --notif-shadow-strong: rgba(0, 0, 0, 0.3);
+            --notif-inset: rgba(0, 0, 0, 0.02);
+            --notif-track: rgba(255, 255, 255, 0.12);
+        }
+
+        #notification-container {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+            width: max-content;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+            #notification-container.has-items {
+                pointer-events: auto;
+            }
+
+        .notification {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            width: max-content;
+            box-sizing: border-box;
+            min-width: 160px;
+            max-width: 320px;
+            padding: 14px 22px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--notif-bg);
+            border: none;
+            box-shadow: 0 10px 30px var(--notif-shadow-soft), inset 0 1px 0 var(--notif-inset);
+            color: var(--notif-text);
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.3;
+            letter-spacing: 0;
+
+            transform: translate(-50%, 40px);
+            z-index: 1;
+            overflow: hidden;
+            will-change: transform, opacity;
+            transition: transform 0.58s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.48s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+        }
+
+        .notification.show {
+            z-index: 30;
+            box-shadow: 0 16px 36px var(--notif-shadow-strong), inset 0 1px 0 var(--notif-inset);
+        }
+
+        #notification-container:not(.expanded) .notification.show[data-depth="1"] {
+            z-index: 20;
+        }
+
+        #notification-container:not(.expanded) .notification.show[data-depth="2"] {
+            z-index: 10;
+        }
+
+        .notification.hide {
+            pointer-events: none;
+            transition: opacity 0.45s ease-out;
+        }
+
+        #notification-container.expanded .notification.show {
+            z-index: 30;
+        }
+
+        .notification.has-progress {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0;
+            border-radius: 22px;
+            min-width: 260px;
+        }
+
+            .notification.has-progress::before,
+            .notification.has-progress::after {
+                border-radius: 22px;
+            }
+
+        .notif-top-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification-progress-container {
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notification-progress-track {
+            flex: 1;
+            height: 4px;
+            background: var(--notif-track);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .notification-progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--notif-text);
+            border-radius: 999px;
+            transition: width 0.1s linear;
+        }
+
+        .notification-progress-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--notif-text);
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+            min-width: 30px;
+            text-align: right;
+        }
+
+</style>
+<base target="_blank">
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="brand-zone">
+            <span class="brand-title">Home</span>
+        </div>
+
+        <nav class="sidebar-nav" id="sidebarTabs">
+            <button class="sidebar-tab-btn active" data-tab="overview" onclick="switchTab('overview')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /></svg>
+                <span data-i18n="tab_overview">Overview</span>
+            </button>
+            <button class="sidebar-tab-btn" data-tab="updatelog" onclick="switchTab('updatelog')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" /></svg>
+                <span data-i18n="tab_updatelog">Update log</span>
+            </button>
+            <button class="sidebar-tab-btn" data-tab="apiversion" onclick="switchTab('apiversion')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
+                <span data-i18n="tab_apiversion">API Version</span>
+            </button>
+            <button class="sidebar-tab-btn" data-tab="roblox" onclick="switchTab('roblox')">
+                <img src="Roblox.png" alt="Roblox" />
+                <span data-i18n="tab_roblox">Roblox</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+
+    </aside>
+
+    <main class="main-content">
+
+        <section class="view active" id="view-overview">
+            <div>
+                <div class="view-title" data-i18n="overview_title">Overview</div>
+                <div class="view-sub" data-i18n="overview_sub">Your current versions and change logs, at a glance</div>
+            </div>
+
+            <div class="section-block">
+                <div class="section-head version-section-head">
+                    <span class="section-title" data-i18n="versionSectionTitle">Version</span>
+                </div>
+                <div class="stat-row stat-row-3">
+                    <div class="stat-cell">
+                        <span class="stat-label" data-i18n="execVersion">Executor Version</span>
+                        <span id="exec-version" class="stat-val" data-i18n="checking">Checking...</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label" data-i18n="apiVersion">API Version</span>
+                        <span id="inj-version" class="stat-val" data-i18n="checking">Checking...</span>
+                    </div>
+                    <div class="stat-cell">
+                        <span class="stat-label" data-i18n="robloxVersion">Roblox Version</span>
+                        <span id="roblox-version" class="stat-val" data-i18n="checking">Checking...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-block">
+                <div class="changelog-columns">
+                    <div class="changelog-col">
+                        <div class="section-head">
+                            <span class="section-title" data-i18n="changeLogs">Change logs</span>
+                            <span class="section-link" data-i18n="viewAll" onclick="switchTab('updatelog')">View all</span>
+                        </div>
+                        <div class="updatelog-panel">
+                            <span class="version-row" id="overview-version-row" style="display:none;">
+                                <span class="version-number" id="overview-version-number"></span>
+                                <span class="latest-tag" data-i18n="latestTag">Latest</span>
+                            </span>
+                            <div id="overview-logs-preview" class="preview-logs"></div>
+                        </div>
+                    </div>
+                    <div class="changelog-col">
+                        <div class="section-head">
+                            <span class="section-title" data-i18n="apiChangeLogs">API change logs</span>
+                            <span class="section-link" data-i18n="viewAll" onclick="switchTab('apiversion')">View all</span>
+                        </div>
+                        <div class="updatelog-panel">
+                            <span class="version-row" id="overview-api-version-row" style="display:none;">
+                                <span class="version-number" id="overview-api-version-number"></span>
+                                <span class="latest-tag" data-i18n="latestTag">Latest</span>
+                            </span>
+                            <div id="overview-api-logs-preview" class="preview-logs"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="view" id="view-updatelog">
+            <div>
+                <div class="view-title" data-i18n="updatelog_title">Update log</div>
+                <div class="view-sub" data-i18n="updatelog_sub">Every version, and what changed</div>
+            </div>
+
+            <div class="updatelog-panel">
+                <span class="version-row" id="updatelog-version-row" style="display:none;">
+                    <span class="version-number" id="updatelog-version-number"></span>
+                    <span class="latest-tag" data-i18n="latestTag">Latest</span>
+                </span>
+
+                <div id="update-log-groups" class="log-groups log-groups-tight"></div>
+            </div>
+        </section>
+
+        <section class="view" id="view-apiversion">
+            <div>
+                <div class="view-title" data-i18n="apiversion_title">API Version</div>
+                <div class="view-sub" data-i18n="apiversion_sub">Every API version, and what changed</div>
+            </div>
+
+            <div class="updatelog-panel">
+                <span class="version-row" id="apiversion-version-row" style="display:none;">
+                    <span class="version-number" id="apiversion-version-number"></span>
+                    <span class="latest-tag" data-i18n="latestTag">Latest</span>
+                </span>
+
+                <div id="api-update-log-groups" class="log-groups log-groups-tight"></div>
+            </div>
+        </section>
+
+        <section class="view" id="view-roblox">
+            <div>
+                <div class="view-title" data-i18n="roblox_title">Roblox</div>
+                <div class="view-sub" data-i18n="roblox_sub">Latest Roblox client version vs. support version</div>
+            </div>
+
+            <div class="stat-row stat-row-3">
+                <div class="stat-cell">
+                    <span class="stat-label" data-i18n="latestVersion">Latest</span>
+                    <span id="roblox-latest-version" class="stat-val">Checking...</span>
+                </div>
+                <div class="stat-cell">
+                    <span class="stat-label" data-i18n="localVersion">Local</span>
+                    <span id="roblox-local-version" class="stat-val">Checking...</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        async function fetchText(file, retries = 2) {
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    const res = await fetch(file + "?t=" + Date.now(), {
+                        cache: "no-store"
+                    });
+                    if (res.ok) {
+                        const text = await res.text();
+                        if (text.trim() !== '') return text;
+                    }
+                } catch {
+                }
+                if (attempt < retries) {
+                    await new Promise(r => setTimeout(r, 300));
+                }
+            }
+            return null;
+        }
+
+        async function fetchFirstAvailable(candidates) {
+            for (const name of candidates) {
+                const text = await fetchText(name);
+                if (text !== null && text.trim() !== '') return text;
+            }
+            return null;
+        }
+
+        window.AppAnimation = {
+            play(mode = 'full') {
+                if (mode === 'exit') return this._playExit();
+                if (mode !== 'full') return;
+                const sidebar = document.querySelector('.sidebar');
+                const main = document.querySelector('.main-content');
+                const targets = [sidebar, main].filter(Boolean);
+
+                targets.forEach(el => {
+                    el.style.transition = "none";
+                    el.style.opacity = "0";
+                    el.style.transform = "translateY(-16px)";
+                });
+
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        targets.forEach(el => {
+                            el.style.transition = "opacity 0.4s ease, transform 0.4s cubic-bezier(0.22,1,0.36,1)";
+                            el.style.opacity = "1";
+                            el.style.transform = "translateY(0)";
+                            setTimeout(() => { el.style.transition = ""; }, 450);
+                        });
+                    });
+                });
+            },
+
+            _playExit(onDone) {
+                const sidebar = document.querySelector('.sidebar');
+                const main = document.querySelector('.main-content');
+                const targets = [sidebar, main].filter(Boolean);
+
+                targets.forEach(el => {
+                    el.style.transition = "opacity 0.22s ease, transform 0.22s cubic-bezier(0.4,0,1,1)";
+                    el.style.opacity = "0";
+                    el.style.transform = "translateY(16px)";
+                });
+
+                setTimeout(() => {
+                    try {
+                        if (window.chrome && window.chrome.webview) {
+                            window.chrome.webview.postMessage(JSON.stringify({ action: 'exitAnimationDone' }));
+                        }
+                    } catch (e) { }
+                    if (typeof onDone === 'function') onDone();
+                }, 240);
+            }
+        };
+
+        window.startEntranceAnimation = function () {
+            window.AppAnimation.play('full');
+        };
+
+        window.playExitAnimation = function (onDone) {
+            window.AppAnimation._playExit(onDone);
+        };
+
+        function staggerLogAnimations(root) {
+            (root || document).querySelectorAll('.log-entry, .log-group').forEach((el, i) => {
+                el.style.animationDelay = (i * 0.03) + "s";
+            });
+        }
+
+        let isTabSwitching = false;
+
+        async function switchTab(tab) {
+            if (isTabSwitching) return;
+            const current = document.querySelector('.view.active');
+            if (current && current.id === 'view-' + tab) return;
+            isTabSwitching = true;
+
+            document.querySelectorAll('.sidebar-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+
+            if (current) {
+                current.style.transition = "opacity 0.18s ease, transform 0.18s ease";
+                current.style.opacity = "0";
+                current.style.transform = "translateY(8px)";
+                await new Promise(r => setTimeout(r, 180));
+                current.classList.remove('active');
+                current.style.transition = "";
+                current.style.opacity = "";
+                current.style.transform = "";
+            }
+
+            const next = document.getElementById('view-' + tab);
+            next.classList.add('active');
+            next.style.transition = "none";
+            next.style.opacity = "0";
+            next.style.transform = "translateY(8px)";
+
+            window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    next.style.transition = "opacity 0.22s ease, transform 0.22s cubic-bezier(0.22,1,0.36,1)";
+                    next.style.opacity = "1";
+                    next.style.transform = "translateY(0)";
+                    setTimeout(() => {
+                        next.style.transition = "";
+                        next.style.opacity = "";
+                        next.style.transform = "";
+                        isTabSwitching = false;
+                    }, 260);
+                });
+            });
+        }
+        window.switchTab = switchTab;
+
+        function parseUpdateLog(raw) {
+            const text = raw.replace(/\r\n/g, '\n').replace(/\\n/g, '\n').trim();
+            if (!text) return [];
+
+            const lines = text.split('\n')
+                .map(l => l.trim())
+                .filter(Boolean)
+                .map(l => l.replace(/^\+\s*/, ''));
+
+            return lines;
+        }
+
+        function renderUpdateLog(raw) {
+            const lines = parseUpdateLog(raw);
+            const container = document.getElementById('update-log-groups');
+            const previewBox = document.getElementById('overview-logs-preview');
+            container.innerHTML = '';
+            previewBox.innerHTML = '';
+
+            if (!lines.length) return;
+
+            const bodyHtml = lines.map(l => `<div class="log-line">${l}</div>`).join('');
+            const groupEl = document.createElement('div');
+            groupEl.className = 'log-group';
+            groupEl.innerHTML = `<div class="log-group-body">${bodyHtml}</div>`;
+            container.appendChild(groupEl);
+
+            const previewLines = lines.slice(0, 4);
+            const previewBodyHtml = previewLines.map(l => `<div class="log-line">${l}</div>`).join('') +
+                (lines.length > 4 ? `<div class="log-line log-entry-more">......</div>` : '');
+            const previewGroupEl = document.createElement('div');
+            previewGroupEl.className = 'log-group';
+            previewGroupEl.innerHTML = `<div class="log-group-body">${previewBodyHtml}</div>`;
+            previewBox.appendChild(previewGroupEl);
+
+            staggerLogAnimations(container);
+            staggerLogAnimations(previewBox);
+        }
+
+        function renderApiUpdateLog(raw) {
+            const lines = parseUpdateLog(raw);
+            const container = document.getElementById('api-update-log-groups');
+            const previewBox = document.getElementById('overview-api-logs-preview');
+            if (container) container.innerHTML = '';
+            if (previewBox) previewBox.innerHTML = '';
+
+            if (!lines.length) return;
+
+            if (container) {
+                const bodyHtml = lines.map(l => `<div class="log-line">${l}</div>`).join('');
+                const groupEl = document.createElement('div');
+                groupEl.className = 'log-group';
+                groupEl.innerHTML = `<div class="log-group-body">${bodyHtml}</div>`;
+                container.appendChild(groupEl);
+                staggerLogAnimations(container);
+            }
+
+            if (previewBox) {
+                const previewLines = lines.slice(0, 4);
+                const previewBodyHtml = previewLines.map(l => `<div class="log-line">${l}</div>`).join('') +
+                    (lines.length > 4 ? `<div class="log-line log-entry-more">......</div>` : '');
+                const previewGroupEl = document.createElement('div');
+                previewGroupEl.className = 'log-group';
+                previewGroupEl.innerHTML = `<div class="log-group-body">${previewBodyHtml}</div>`;
+                previewBox.appendChild(previewGroupEl);
+                staggerLogAnimations(previewBox);
+            }
+        }
+
+        async function fetchLatestRobloxVersion() {
+            try {
+                const res = await fetch('https://weao.xyz/api/versions/current', {
+                    cache: 'no-store'
+                });
+                if (!res.ok) return null;
+                const data = await res.json();
+                return data && data.Windows ? data.Windows : null;
+            } catch {
+                return null;
+            }
+        }
+
+        async function initRoblox(localVersionText) {
+            const latestEl = document.getElementById('roblox-latest-version');
+            const localEl = document.getElementById('roblox-local-version');
+            const statusRow = document.getElementById('roblox-status');
+            const statusText = document.getElementById('roblox-status-text');
+
+            const local = localVersionText ? localVersionText.trim() : null;
+            localEl.textContent = local || 'N/A';
+
+            const latest = await fetchLatestRobloxVersion();
+            if (latest) {
+                latestEl.textContent = latest;
+            } else {
+                latestEl.textContent = 'Unavailable';
+            }
+
+            if (latest && local) {
+                if (latest === local) {
+                    statusRow.classList.add('ok');
+                    statusText.textContent = 'Up to date';
+                } else {
+                    statusRow.classList.add('stale');
+                    statusText.textContent = 'Outdated — a newer Roblox version is available';
+                }
+            } else {
+                statusText.textContent = 'Unable to compare versions';
+            }
+        }
+
+        async function init() {
+            const ev = await fetchFirstAvailable(['version.txt', 'Version.txt', 'VERSION.txt', 'Executor-version.txt', 'executor-version.txt', 'Executor-Version.txt', 'exec-version.txt']);
+            document.getElementById('exec-version').innerText = ev ? ev.trim() : 'Unavailable';
+
+            const versionRow = document.getElementById('updatelog-version-row');
+            const versionNumberEl = document.getElementById('updatelog-version-number');
+            const overviewRow = document.getElementById('overview-version-row');
+            const overviewNumberEl = document.getElementById('overview-version-number');
+            if (ev) {
+                const versionText = ev.trim();
+                if (versionRow && versionNumberEl) {
+                    versionNumberEl.textContent = versionText;
+                    versionRow.style.display = '';
+                }
+                if (overviewRow && overviewNumberEl) {
+                    overviewNumberEl.textContent = versionText;
+                    overviewRow.style.display = '';
+                }
+            }
+
+            const iv = await fetchFirstAvailable(['api-version.txt', 'Api-version.txt', 'API-version.txt', 'API-Version.txt']);
+            document.getElementById('inj-version').innerText = iv ? iv.trim() : 'Unavailable';
+
+            const apiVersionRow = document.getElementById('apiversion-version-row');
+            const apiVersionNumberEl = document.getElementById('apiversion-version-number');
+            const overviewApiRow = document.getElementById('overview-api-version-row');
+            const overviewApiNumberEl = document.getElementById('overview-api-version-number');
+            if (iv) {
+                const apiVersionText = iv.trim();
+                if (apiVersionRow && apiVersionNumberEl) {
+                    apiVersionNumberEl.textContent = apiVersionText;
+                    apiVersionRow.style.display = '';
+                }
+                if (overviewApiRow && overviewApiNumberEl) {
+                    overviewApiNumberEl.textContent = apiVersionText;
+                    overviewApiRow.style.display = '';
+                }
+            }
+
+            const rv = await fetchFirstAvailable(['roblox-version.txt', 'Roblox-version.txt', 'Roblox-Version.txt']);
+            document.getElementById('roblox-version').innerText = rv ? rv.trim() : 'Unavailable';
+
+            const ul = await fetchText('update-logs.txt');
+            if (ul) renderUpdateLog(ul);
+
+            const aul = await fetchText('api-update-logs.txt');
+            if (aul) renderApiUpdateLog(aul);
+
+            initRoblox(rv);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+        });
+
+        document.addEventListener('click', function (e) {
+            const tile = e.target && e.target.closest('.external-link');
+            if (tile) {
+                e.preventDefault();
+                const url = tile.getAttribute('href');
+                window.open(url, '_blank');
+            }
+        }, false);
+
+        const i18n = {
+            en: {
+                tab_overview: "Overview",
+                tab_updatelog: "Executor Update log",
+                tab_apiversion: "API Update log",
+                tab_roblox: "Roblox Version",
+                discord: "Discord",
+                website: "Website",
+                overview_title: "Overview",
+                overview_sub: "Your current versions and change logs, at a glance",
+                execVersion: "Executor Version",
+                apiVersion: "API Version",
+                robloxVersion: "Roblox Version",
+                checking: "Checking...",
+                planName: "Free Plan",
+                planDesc: "Core features included, no subscription required",
+                planBadge: "Free",
+                versionSectionTitle: "Version",
+                changeLogs: "Change logs",
+                apiChangeLogs: "API change logs",
+                viewAll: "View all",
+                updatelog_title: "Executor Update log",
+                updatelog_sub: "Every version, and what changed",
+                latestTag: "Latest",
+                apiversion_title: "API Update log",
+                apiversion_sub: "Every API version, and what changed",
+                roblox_title: "Roblox Version",
+                roblox_sub: "Latest Roblox client version vs. support version",
+                latestVersion: "Latest",
+                latestTag: "LATEST",
+                localVersion: "Support",
+                localTag: "Support"
+            },
+            zh: {
+                tab_overview: "總覽",
+                tab_updatelog: "執行器更新日誌",
+                tab_apiversion: "API 更新日誌",
+                tab_roblox: "Roblox 版本",
+                discord: "Discord",
+                website: "官方網站",
+                overview_title: "總覽",
+                overview_sub: "目前版本與更新日誌一目了然",
+                execVersion: "執行器版本",
+                apiVersion: "API 版本",
+                robloxVersion: "Roblox 版本",
+                checking: "檢查中...",
+                planName: "免費方案",
+                planDesc: "包含核心功能，無需訂閱",
+                planBadge: "免費",
+                versionSectionTitle: "版本",
+                changeLogs: "執行器更新日誌",
+                apiChangeLogs: "API 更新日誌",
+                viewAll: "查看全部",
+                updatelog_title: "執行器更新日誌",
+                updatelog_sub: "每個版本的完整變更內容",
+                latestTag: "最新",
+                apiversion_title: "API 更新日誌",
+                apiversion_sub: "每個 API 版本的完整變更內容",
+                roblox_title: "Roblox Version",
+                roblox_sub: "最新 Roblox 用戶端版本與支援版本比較",
+                latestVersion: "最新",
+                latestTag: "最新",
+                localVersion: "支援",
+                localTag: "支援"
+            }
+        };
+
+        let currentLang = "en";
+
+        window.setLanguage = function (lang) {
+            if (!i18n[lang]) return;
+            currentLang = lang;
+            const t = i18n[lang];
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (t[key]) el.textContent = t[key];
+            });
+        };
+
+        setLanguage('en');
+    </script>
+    <div id="notification-container"></div>
+    <script>
+        (function () {
+            const MAX_VISIBLE_NOTIFICATIONS = 3;
+            const DEPTH_Y = [0, -16, -28, -38, -46];
+            const DEPTH_SCALE = [1, 0.94, 0.88, 0.84, 0.80];
+            let currentLoadingToast = null;
+
+            function applyNotifStyles(el, y, scale, opacity) {
+                const o = Math.max(0, Math.min(1, opacity));
+                el.style.transform = `translate(-50%, ${y.toFixed(2)}px) scale(${scale})`;
+                el.style.opacity = o;
+            }
+
+            function moveNotification(el, { y, scale, opacity }, { instant = false } = {}) {
+                if (instant) {
+                    el.style.transition = 'none';
+                    applyNotifStyles(el, y, scale, opacity);
+                    void el.offsetHeight;
+                    el.style.transition = '';
+                    return;
+                }
+                applyNotifStyles(el, y, scale, opacity);
+            }
+
+            function primeNotificationEntrance(el) {
+                moveNotification(el, { y: 40, scale: 1, opacity: 0 }, { instant: true });
+            }
+
+            function restackNotifications() {
+                const container = document.getElementById('notification-container');
+                const items = [...container.querySelectorAll('.notification')].filter(el => !el.dataset.removing);
+                container.classList.toggle('has-items', items.length > 0);
+                const ordered = items.slice().reverse();
+                const isExpanded = container.classList.contains('expanded');
+                ordered.forEach((item, depth) => {
+                    if (depth < MAX_VISIBLE_NOTIFICATIONS) {
+                        item.dataset.depth = depth;
+                        item.classList.add('show');
+                        if (!isExpanded) moveNotification(item, { y: DEPTH_Y[depth], scale: DEPTH_SCALE[depth], opacity: 1 });
+                    } else {
+                        dismissNotification(item);
+                    }
+                });
+                if (isExpanded) applyExpandedLayout();
+            }
+
+            function applyExpandedLayout() {
+                const container = document.getElementById('notification-container');
+                const items = [...container.querySelectorAll('.notification.show')]
+                    .filter(el => !el.dataset.removing)
+                    .sort((a, b) => parseInt(a.dataset.depth) - parseInt(b.dataset.depth));
+                const ITEM_SPACING = 10;
+                let offset = 0;
+                items.forEach(item => {
+                    moveNotification(item, { y: -offset, scale: 1, opacity: 1 });
+                    offset += item.offsetHeight + ITEM_SPACING;
+                });
+            }
+
+            function clearExpandedLayout() {
+                const container = document.getElementById('notification-container');
+                const items = [...container.querySelectorAll('.notification.show')].filter(el => !el.dataset.removing);
+                items.forEach(item => {
+                    const depth = parseInt(item.dataset.depth || '0', 10);
+                    moveNotification(item, { y: DEPTH_Y[depth] ?? 0, scale: DEPTH_SCALE[depth] ?? 1, opacity: 1 });
+                });
+            }
+
+            function dismissNotification(item) {
+                if (!item || item.dataset.removing) return;
+                item.dataset.removing = '1';
+                item.classList.remove('show');
+                item.classList.add('hide');
+                item.style.opacity = 0;
+                restackNotifications();
+                setTimeout(() => { item.remove(); }, 460);
+            }
+
+            function showNotification(message, isError = false) {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                if (currentLoadingToast) {
+                    dismissNotification(currentLoadingToast);
+                    currentLoadingToast = null;
+                }
+
+                const toast = document.createElement('div');
+                toast.className = 'notification';
+
+                let icon;
+                if (isError === 'loading') {
+                    icon = `<svg class="spinner" viewBox="0 0 24 24" width="16" height="16" style="transform-origin:50% 50%;">
+                        <circle cx="12" cy="12" r="9" stroke="var(--notif-track)" stroke-width="2.5" fill="none"/>
+                        <circle cx="12" cy="12" r="9" stroke="var(--notif-text)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="50" stroke-dashoffset="35"/>
+                    </svg>`;
+                } else if (isError) {
+                    icon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#d32f2f" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                    </svg>`;
+                } else {
+                    icon = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--notif-text)" stroke-width="2.5">
+                        <path d="M20 6L9 17l-5-5"/>
+                    </svg>`;
+                }
+
+                const textBlock = `<div style="display:flex;flex-direction:column;gap:2px;">
+                    <span style="color: var(--notif-text); font-size:14px; font-weight:500;">${message}</span>
+                </div>`;
+
+                toast.innerHTML = `<div style="display:flex;align-items:center;gap:12px;"><div style="display:flex;flex-shrink:0;">${icon}</div>${textBlock}</div>`;
+
+                container.appendChild(toast);
+                primeNotificationEntrance(toast);
+
+                void toast.offsetHeight;
+                requestAnimationFrame(() => requestAnimationFrame(() => restackNotifications()));
+
+                if (isError === 'loading') {
+                    currentLoadingToast = toast;
+                    return;
+                }
+                setTimeout(() => dismissNotification(toast), 3500);
+            }
+
+            const container = document.getElementById('notification-container');
+            if (container) {
+                container.addEventListener('mouseenter', () => {
+                    if (!container.classList.contains('has-items')) return;
+                    container.classList.add('expanded');
+                    applyExpandedLayout();
+                });
+                container.addEventListener('mouseleave', () => {
+                    container.classList.remove('expanded');
+                    clearExpandedLayout();
+                });
+            }
+
+            let activeProgressObj = null;
+
+            function showProgressNotification(message, durationSeconds) {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                if (activeProgressObj) {
+                    completeProgressNotification('100%');
+                }
+
+                const toast = document.createElement('div');
+                toast.className = 'notification has-progress';
+
+                const icon = `<svg class="spinner" viewBox="0 0 24 24" width="16" height="16" style="transform-origin:50% 50%;">
+                    <circle cx="12" cy="12" r="9" stroke="var(--notif-track)" stroke-width="2.5" fill="none"/>
+                    <circle cx="12" cy="12" r="9" stroke="var(--notif-text)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="50" stroke-dashoffset="35"/>
+                </svg>`;
+
+                toast.innerHTML = `<div class="notif-top-row"><div style="display:flex;">${icon}</div><span style="color:var(--notif-text);">${message}</span></div>`;
+
+                const barContainer = document.createElement('div');
+                barContainer.className = 'notification-progress-container';
+                const progressTrack = document.createElement('div');
+                progressTrack.className = 'notification-progress-track';
+                const progressFill = document.createElement('div');
+                progressFill.className = 'notification-progress-fill';
+                progressTrack.appendChild(progressFill);
+                const progressLabel = document.createElement('div');
+                progressLabel.className = 'notification-progress-label';
+                progressLabel.textContent = '0%';
+                barContainer.appendChild(progressTrack);
+                barContainer.appendChild(progressLabel);
+                toast.appendChild(barContainer);
+
+                container.appendChild(toast);
+                primeNotificationEntrance(toast);
+
+                void toast.offsetHeight;
+                requestAnimationFrame(() => requestAnimationFrame(() => restackNotifications()));
+
+                activeProgressObj = { toast, fill: progressFill, label: progressLabel };
+            }
+
+            function updateProgressNotification(percent) {
+                if (!activeProgressObj) return;
+                const p = Math.max(0, Math.min(99, percent));
+                activeProgressObj.fill.style.width = p + '%';
+                activeProgressObj.label.textContent = Math.floor(p) + '%';
+            }
+
+            function completeProgressNotification(finishMessage) {
+                if (!activeProgressObj) return;
+                const { toast, fill, label } = activeProgressObj;
+                const span = toast.querySelector('.notif-top-row span');
+                if (span && finishMessage) span.textContent = finishMessage;
+
+                fill.style.transition = 'width 2s cubic-bezier(0.16, 1, 0.3, 1)';
+                fill.style.width = '100%';
+                if (label) label.textContent = '100%';
+
+                setTimeout(() => dismissNotification(toast), 2000);
+                activeProgressObj = null;
+            }
+
+            window.showNotification = showNotification;
+            window.showProgressNotification = showProgressNotification;
+            window.updateProgressNotification = updateProgressNotification;
+            window.completeProgressNotification = completeProgressNotification;
+        })();
+    </script>
+</body>
+
+</html>
