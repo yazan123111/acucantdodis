@@ -1,0 +1,151 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0/win-x64",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {},
+    ".NETCoreApp,Version=v8.0/win-x64": {
+      "Electra/1.0.0": {
+        "dependencies": {
+          "discordrpc": "1.6.1.70",
+          "flaui.core": "5.0.0.0",
+          "flaui.uia3": "5.0.0.0",
+          "Guna.UI2": "2.0.4.8",
+          "microsoft.web.webview2.core": "1.0.4129.50",
+          "microsoft.web.webview2.winforms": "1.0.4129.50",
+          "newtonsoft.json": "13.0.0.0",
+          "QuorumAPI": "1.0.0.0"
+        },
+        "runtime": {
+          "Electra.dll": {}
+        }
+      },
+      "discordrpc/1.6.1.70": {
+        "runtime": {
+          "discordrpc.dll": {
+            "assemblyVersion": "1.6.1.70",
+            "fileVersion": "1.6.1.70"
+          }
+        }
+      },
+      "flaui.core/5.0.0.0": {
+        "runtime": {
+          "flaui.core.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.0.0"
+          }
+        }
+      },
+      "flaui.uia3/5.0.0.0": {
+        "runtime": {
+          "flaui.uia3.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.0.0"
+          }
+        }
+      },
+      "Guna.UI2/2.0.4.8": {
+        "runtime": {
+          "Guna.UI2.dll": {
+            "assemblyVersion": "2.0.4.8",
+            "fileVersion": "2.0.4.8"
+          }
+        }
+      },
+      "microsoft.web.webview2.core/1.0.4129.50": {
+        "runtime": {
+          "microsoft.web.webview2.core.dll": {
+            "assemblyVersion": "1.0.4129.50",
+            "fileVersion": "1.0.4129.50"
+          }
+        }
+      },
+      "microsoft.web.webview2.winforms/1.0.4129.50": {
+        "runtime": {
+          "microsoft.web.webview2.winforms.dll": {
+            "assemblyVersion": "1.0.4129.50",
+            "fileVersion": "1.0.4129.50"
+          }
+        }
+      },
+      "newtonsoft.json/13.0.0.0": {
+        "runtime": {
+          "newtonsoft.json.dll": {
+            "assemblyVersion": "13.0.0.0",
+            "fileVersion": "13.0.1.25517"
+          }
+        }
+      },
+      "QuorumAPI/1.0.0.0": {
+        "runtime": {
+          "QuorumAPI.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Interop.UIAutomationClient/10.0.19041.0": {
+        "runtime": {
+          "Interop.UIAutomationClient.dll": {
+            "assemblyVersion": "10.0.19041.0",
+            "fileVersion": "10.0.19041.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Electra/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "discordrpc/1.6.1.70": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "flaui.core/5.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "flaui.uia3/5.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Guna.UI2/2.0.4.8": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "microsoft.web.webview2.core/1.0.4129.50": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "microsoft.web.webview2.winforms/1.0.4129.50": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "newtonsoft.json/13.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "QuorumAPI/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Interop.UIAutomationClient/10.0.19041.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
